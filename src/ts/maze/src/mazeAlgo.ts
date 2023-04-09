@@ -1,5 +1,9 @@
-import { Grid2d } from "./grid2d.js";
+import { Grid2d } from "../../grid/src/index.js";
 
-export interface MazeAlgo<T> {
-    createMaze(grid: Grid2d<T>): Grid2d<T>;
-}
+export interface MazeAlgo {
+
+    executeRandom(grid: Grid2d<number>, exits: number): Grid2d<number>;
+
+    executeFromSeed(grid: Grid2d<number>, seed: string): Grid2d<number>;
+
+} 

@@ -1,10 +1,12 @@
-import { Grid2d } from "./grid2d";
+import { Maze2d } from "./maze2d.js";
 
 export class MazeViewer {
   private readonly canvas: HTMLCanvasElement;
   private readonly context: CanvasRenderingContext2D;
+  private readonly maze: Maze2d;
 
-  constructor(canvasWidth: number = 500, canvasHeight: number = 500) {
+  constructor(maze: Maze2d, canvasWidth: number = 500, canvasHeight: number = 500) {
+    this.maze = maze;
     this.canvas = document.createElement('canvas');
     this.canvas.width = canvasWidth;
     this.canvas.height = canvasHeight;
@@ -14,10 +16,10 @@ export class MazeViewer {
     this.context = this.canvas.getContext('2d')!;
   }
 
-  public draw(maze: Grid2d<number>, ): void {
-    const tileSize = this.canvas.width / maze.cols;
+  public draw(): void {
+    const tileSize = this.canvas.width / this.maze.cols;
 
-    maze.forEach((tile, x, y) => {
+    this.maze.grid.forEach((tile, x, y) => {
       if (tile === 0) {
         this.context.fillStyle = 'white';
       } else if (tile === 1) {
