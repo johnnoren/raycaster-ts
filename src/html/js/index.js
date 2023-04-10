@@ -1,8 +1,4 @@
-import { Array2dBuilder } from "./array2dBuilder.js";
-import { MapViewer2d } from "./mapViewer2d.js";
-import { MazeBuilder } from "./mazeBuilder.js";
-const map = new Array2dBuilder(11, 11).fill(1).build();
-const carvedMap = new MazeBuilder(map).carveMaze();
-const viewer = new MapViewer2d(carvedMap);
-console.log('log: ' + carvedMap);
+import { MazeFacade } from "./maze/src/index.js";
+const maze = new MazeFacade().getMaze(21, 21);
+const viewer = new MazeFacade().getMazeViewer(maze, 500, 500);
 viewer.draw();

@@ -1,6 +1,6 @@
-import { MazeFacade } from "./maze/src";
+import { MazeFacade } from "./maze/src/index.js";
 
-const maze = new MazeFacade().getMaze(10, 10, 2);
-const viewer = new MazeFacade().getViewer(500, 500);
+const maze = new MazeFacade().getMaze(21, 21);
+const viewer = new MazeFacade().getMazeViewer(maze, 500, 500);
 
-viewer.draw(maze);
+viewer.draw();

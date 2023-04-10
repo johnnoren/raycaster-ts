@@ -1,1 +1,1 @@
-export { MazeFacade } from "./mazeFacade";
+export { MazeFacade } from "./mazeFacade.js";

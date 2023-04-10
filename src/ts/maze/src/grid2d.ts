@@ -1,37 +1,34 @@
 export type Position = [x: number, y: number];
 
 export class Grid2d {
-    private rows: number;
-    private cols: number;
-    private grid: number[][];
-    private blockTypes: { [key: string]: number } = {
+    public readonly cols: number;
+    public readonly rows: number;
+    private readonly grid: number[][];
+    private readonly blockTypes: { [key: string]: number } = {
         "wall": 1,
         "path": 0,
     };
-    private rightmostCol: number;
-    private leftmostCol: number = 0;
-    private topmostRow: number = 0;
-    private bottommostRow: number;
+    private readonly rightmostCol: number;
+    private readonly leftmostCol: number = 0;
+    private readonly topmostRow: number = 0;
+    private readonly bottommostRow: number;
 
-    private rightmostInnerCellCol: number;
-    private leftmostInnerCellCol: number = 1;
-    private topmostInnerCellRow: number = 1;
-    private bottommostInnerCellRow: number;
+    private readonly isEven = (n: number) => { return n % 2 === 0; };
+    private readonly isOdd = (n: number) => { return n % 2 === 1; };
 
-    private isEven = (n: number) => { return n % 2 === 0; };
-    private isOdd = (n: number) => { return n % 2 === 1; };
+    private readonly isLocatedAtTopOrBottomEdge = (y: number) => y === this.topmostRow || y === this.bottommostRow;
+    private readonly isLocatedAtLeftOrRightEdge = (x: number) => x === this.leftmostCol || x === this.rightmostCol;
 
-    private isLocatedAtTopOrBottomEdge = (y: number) => y === this.topmostRow || y === this.bottommostRow;
-    private isLocatedAtLeftOrRightEdge = (x: number) => x === this.leftmostCol || x === this.rightmostCol;
-
-    constructor(rows: number, cols: number) {
-        this.rows = rows;
-        this.cols = cols;
+    constructor(cols: number, rows: number) {
+        if (rows < 3 || cols < 3) {
+            throw new Error("Grid2d must have at least 3 rows and 3 cols");
+        }
+        if (rows % 2 === 0 || cols % 2 === 0) {
+            throw new Error("Grid2d must have an odd number of rows and cols");
+        }
         this.grid = Array(cols).fill(Array(rows).fill(this.blockTypes.wall));
         this.rightmostCol = cols - 1;
         this.bottommostRow = rows - 1;
-        this.rightmostInnerCellCol = cols - 2;
-        this.bottommostInnerCellRow = rows - 2;
     }
 
     forEach(callback: (value: number, x: number, y: number) => void): void {
@@ -90,5 +87,29 @@ export class Grid2d {
         const verticalNeighbors = [this.grid[x]![y - 1], this.grid[x]![y + 1]].filter(n => typeof n === "number");
         
         return (this.isOdd(y)) ? horizontalNeighbors as number[] : verticalNeighbors as number[];
-    }      
+    }
+    
+    getInnerCellPositions(): Position[] {
+        return this.getPositions(this.isInnerCell);
+    }
+
+    getInnerIntersectionCellPositions(): Position[] {
+        return this.getPositions(this.isInnerIntersectionCell);
+    }
+
+    getCellsByValue(value: number): Position[] {
+        return this.getPositions(([x, y]) => this.grid[x]![y] === value);
+    }
+
+    setCellsToValue(positions: Position[], value: number): void {
+        positions.forEach(([x, y]) => { this.grid[x]![y] = value; });
+    }
+
+    addExit() {
+        const possibleExitPositions = this.getPositions(this.isPerimeterIntersectionCell);
+        const exitPosition = possibleExitPositions[Math.floor(Math.random() * possibleExitPositions.length)];
+
+        this.setCellsToValue([exitPosition!], this.blockTypes.path!);
+    }
+
 }

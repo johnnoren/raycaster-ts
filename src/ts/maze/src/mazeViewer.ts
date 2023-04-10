@@ -19,7 +19,7 @@ export class MazeViewer {
   public draw(): void {
     const tileSize = this.canvas.width / this.maze.cols;
 
-    this.maze.grid.forEach((tile, x, y) => {
+    this.maze.forEachTile((tile, x, y) => {
       if (tile === 0) {
         this.context.fillStyle = 'white';
       } else if (tile === 1) {
