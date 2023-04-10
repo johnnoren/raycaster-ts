@@ -17,13 +17,13 @@ export class MazeViewer {
   }
 
   public draw(): void {
+    this.context.strokeRect(0, 0, this.canvas.width, this.canvas.height);
     const tileSize = this.canvas.width / this.maze.cols;
-
     this.maze.forEachTile((tile, x, y) => {
       if (tile === 0) {
-        this.context.fillStyle = 'white';
-      } else if (tile === 1) {
         this.context.fillStyle = 'black';
+      } else if (tile === 1) {
+        this.context.fillStyle = 'white';
       } else {
         throw new Error(`Invalid value in tile: ${tile}`);
       }

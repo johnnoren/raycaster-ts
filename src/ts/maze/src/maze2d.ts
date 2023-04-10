@@ -17,6 +17,10 @@ export class Maze2d {
         return this.grid.cols;
     }
 
+    getAllValues(): number[] {
+        return this.grid.getAllValues();
+    }
+
     forEachTile(callback: (value: number, x: number, y: number) => void): void {
         this.grid.forEach(callback);
     }
