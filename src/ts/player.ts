@@ -24,34 +24,33 @@ export class Player implements GameObject {
     }
 
     public turnLeft(): void {
-        this.turn(-1);
+        this.turn(-2);
     }
 
     public turnRight(): void {
-        this.turn(1);
+        this.turn(2);
     }
 
     public moveForward(): void {
-        this.move(1);
+        this.move(0.5);
     }
 
     public moveBackward(): void {
-        this.move(-1);
+        this.move(-0.5);
     }
 
     public turn(angle: number): void {
         const radians = angle * Math.PI / 180;
         const cosAngle = Math.cos(radians);
         const sinAngle = Math.sin(radians);
-        const sign = angle > 0 ? 1 : -1;
         const rotationMatrix: Matrix2 = [
-            [cosAngle, -sign * sinAngle],
-            [sign * sinAngle, cosAngle]
+            [cosAngle, -sinAngle],
+            [sinAngle, cosAngle]
         ];
         const newDirection: Vector2 = this.multiplyMatrixAndVector(rotationMatrix, this.direction);
         this.direction = newDirection;
     }
-
+    
     private move(distance: number): void {
         const newPosition: Position = {
             x: this.position.x + distance * this.direction.x,
