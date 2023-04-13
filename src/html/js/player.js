@@ -1,15 +1,18 @@
 export class Player {
-    constructor(position, direction) {
+    constructor(position, direction, status) {
         this.position = position;
         this.direction = direction;
+        this.status = status;
     }
-    drawPlayer(context, tileSize) {
+    update() {
+    }
+    render(canvas) {
         const { x, y } = this.position;
-        const radius = 10;
-        const halfTileSize = tileSize / 2;
+        const context = canvas.getContext('2d');
+        const radius = 5;
         context.beginPath();
-        context.arc(x * tileSize + halfTileSize, y * tileSize + halfTileSize, radius, 0, Math.PI * 2);
-        context.fillStyle = 'red';
+        context.arc(x, y, radius, 0, Math.PI * 2);
+        context.fillStyle = 'green';
         context.fill();
         context.closePath();
     }

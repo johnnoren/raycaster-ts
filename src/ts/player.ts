@@ -1,19 +1,24 @@
-export type Position = { x: number; y: number; }
+import { GameObject, Status } from "./gameObject";
+import { Position } from "./maze2dFactory";
+
 export type Vector2 = { x: number; y: number; }
 
-export class Player {
-    constructor(public position: Position, public direction: Vector2) {}
+export class Player implements GameObject {
+    constructor(public position: Position, public direction: Vector2, public status: Status) { }
 
-    public drawPlayer(context: CanvasRenderingContext2D, tileSize: number): void {
+    update(): void {
+    }
+
+    render(canvas: HTMLCanvasElement): void {
         const { x, y } = this.position;
-        const radius = 10;
-        const halfTileSize = tileSize / 2;
-      
-        context.beginPath();
-        context.arc(x * tileSize + halfTileSize, y * tileSize + halfTileSize, radius, 0, Math.PI * 2);
-        context.fillStyle = 'red';
-        context.fill();
-        context.closePath();
-      }
-      
+        const context = canvas.getContext('2d');
+        const radius = 5;
+
+        context!.beginPath();
+        context!.arc(x, y, radius, 0, Math.PI * 2);
+        context!.fillStyle = 'green';
+        context!.fill();
+        context!.closePath();
+    }
 }
+
