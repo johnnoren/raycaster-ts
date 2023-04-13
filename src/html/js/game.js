@@ -1,6 +1,7 @@
 import { GameLoop } from "./gameLoop.js";
 import { Status } from "./gameObject.js";
 import { GameObjectManager } from "./gameObjectManager.js";
+import { InfoManager } from "./infoManager.js";
 import { InputManager } from "./inputManager.js";
 import { BlockType, Maze2dFactory } from "./maze2dFactory.js";
 import { Player } from "./player.js";
@@ -31,6 +32,7 @@ export class Game {
             render: this.render.bind(this)
         };
         this.gameLoop = new GameLoop(this.gameLoopOptions);
+        this.infoManager = new InfoManager(this.gameLoop);
         this.fovCanvas = document.createElement('canvas');
         this.fovCanvas.width = 500;
         this.fovCanvas.height = 500;
@@ -46,6 +48,7 @@ export class Game {
     }
     update() {
         this.gameObjectsManager.update();
+        this.infoManager.update();
     }
     render() {
         this.gameObjectsManager.render(this.mapCanvas);
