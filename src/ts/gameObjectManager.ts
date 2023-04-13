@@ -14,7 +14,7 @@ export class GameObjectManager {
 
     public render(canvas: HTMLCanvasElement): void {
         const context = canvas.getContext('2d');
-        //context!.clearRect(0, 0, canvas.width, canvas.height);
+        context!.clearRect(0, 0, canvas.width, canvas.height);
         this.gameObjects.forEach(gameObject => gameObject.render(canvas));
     }
 

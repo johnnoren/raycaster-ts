@@ -1,6 +1,7 @@
 import { GameLoop, GameLoopOptions } from "./gameLoop.js";
 import { GameObject, Status } from "./gameObject.js";
 import { GameObjectManager } from "./gameObjectManager.js";
+import { InputManager } from "./inputManager.js";
 import { BlockType, Maze2dFactory, Cell, Position } from "./maze2dFactory.js";
 import { Player } from "./player.js";
 
@@ -11,6 +12,7 @@ export class Game {
     private gameObjectsManager: GameObjectManager;
     private gameLoopOptions: GameLoopOptions;
     private player: Player;
+    private inputManager: InputManager;
 
     constructor() {
         this.mapCanvas = document.createElement('canvas');
@@ -35,6 +37,8 @@ export class Game {
         this.gameObjectsManager = new GameObjectManager();
         this.gameObjects.forEach(gameObject => this.gameObjectsManager.add(gameObject));
 
+        this.inputManager = new InputManager(this.player);
+
         this.gameLoopOptions = {
             input: this.input.bind(this),
             update: this.update.bind(this),
@@ -45,7 +49,7 @@ export class Game {
     }
 
     public input(): void {
-        // TODO: Implement input
+        this.inputManager.handleInput();
     }
 
     public update(): void {

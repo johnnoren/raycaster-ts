@@ -135,15 +135,6 @@ class Maze2d {
     update() {
     }
     render(canvas) {
-        if (!this.currentStateIsRendered) {
-            this.renderAllTiles(canvas);
-            this.currentStateIsRendered = true;
-        }
-    }
-    get startPosition() {
-        return this.cells.find((cell) => cell.blockType === BlockType.Start).position;
-    }
-    renderAllTiles(canvas) {
         const context = canvas.getContext('2d');
         context.strokeRect(0, 0, canvas.width, canvas.height);
         const tileSize = canvas.width / this.cols;
@@ -166,5 +157,8 @@ class Maze2d {
             const y = cell.position.y;
             context.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
         });
+    }
+    get startPosition() {
+        return this.cells.find((cell) => cell.blockType === BlockType.Start).position;
     }
 }

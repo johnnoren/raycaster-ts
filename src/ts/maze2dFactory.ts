@@ -49,11 +49,11 @@ export class Maze2dFactory {
         for (let x = 0; x < cols; x++) {
             for (let y = 0; y < rows; y++) {
                 const cell: Cell = {
-                    type: this.getCellType({x, y}),
-                    location: this.getLocation({x, y}, cols, rows),
+                    type: this.getCellType({ x, y }),
+                    location: this.getLocation({ x, y }, cols, rows),
                     group: counter,
                     blockType: BlockType.Wall,
-                    position: {x, y},
+                    position: { x, y },
                 };
                 cells.push(cell);
                 counter++;
@@ -61,7 +61,7 @@ export class Maze2dFactory {
         }
     }
 
-    private getCellType({x, y}: Position): CellType {
+    private getCellType({ x, y }: Position): CellType {
         if (this.isOdd(x) && this.isOdd(y)) {
             return CellType.Regular;
         }
@@ -74,7 +74,7 @@ export class Maze2dFactory {
         return CellType.Static;
     }
 
-    private getLocation({x, y}: Position, cols: number, rows: number): Location {
+    private getLocation({ x, y }: Position, cols: number, rows: number): Location {
         const isPartOfPerimeter = y === 0 || y === rows - 1 || x === 0 || x === cols - 1;
 
         return isPartOfPerimeter ? Location.Perimeter : Location.Inner;
@@ -86,12 +86,12 @@ export class Maze2dFactory {
         const positionsAreSame = (position1: Position, position2: Position) => {
             return position1.x === position2.x && position1.y === position2.y;
         };
-          
-        if (cell.type === CellType.Intersection && cell.location === Location.Inner) {
-            const connectedPositions: [Position, Position] = (this.isEven(x) ? [{x: x-1, y: y},{x: x+1, y: y}] : [{x: x, y: y-1},{x: x, y: y+1}]);
 
-            return cells.filter(cell => positionsAreSame(cell.position, connectedPositions[0]) || 
-            positionsAreSame(cell.position, connectedPositions[1]));
+        if (cell.type === CellType.Intersection && cell.location === Location.Inner) {
+            const connectedPositions: [Position, Position] = (this.isEven(x) ? [{ x: x - 1, y: y }, { x: x + 1, y: y }] : [{ x: x, y: y - 1 }, { x: x, y: y + 1 }]);
+
+            return cells.filter(cell => positionsAreSame(cell.position, connectedPositions[0]) ||
+                positionsAreSame(cell.position, connectedPositions[1]));
         }
         throw new Error("getConnectedCells() is not implemented for this cell type");
     }
@@ -113,7 +113,7 @@ export class Maze2dFactory {
                         cell.blockType = BlockType.Path;
                     }
                 });
-            } 
+            }
         });
 
         this.addExit(cells);
@@ -129,7 +129,7 @@ export class Maze2dFactory {
         function randomSort<T>(_a: T, _b: T): number {
             return Math.random() < 0.5 ? -1 : 1;
         }
-        
+
         array.sort(randomSort);
         return array;
     }
@@ -151,40 +151,29 @@ class Maze2d implements GameObject {
 
     public getClosestCell(position: Position, blockType: BlockType): Cell {
         const pathCells = this.cells.filter(cell => cell.blockType === blockType);
-      
+
         let closestPathCell: Cell | null = null;
         let closestDistance = Number.MAX_SAFE_INTEGER;
-      
+
         for (const cell of pathCells) {
-          const distance = Math.sqrt(
-            Math.pow(cell.position.x - position.x!, 2) +
-            Math.pow(cell.position.y - position.y!, 2)
-          );
-      
-          if (distance < closestDistance) {
-            closestPathCell = cell;
-            closestDistance = distance;
-          }
+            const distance = Math.sqrt(
+                Math.pow(cell.position.x - position.x!, 2) +
+                Math.pow(cell.position.y - position.y!, 2)
+            );
+
+            if (distance < closestDistance) {
+                closestPathCell = cell;
+                closestDistance = distance;
+            }
         }
-      
+
         return closestPathCell!;
-      }
+    }
 
     update(): void {
-        
+
     }
     render(canvas: HTMLCanvasElement): void {
-        if (!this.currentStateIsRendered) {
-            this.renderAllTiles(canvas);
-            this.currentStateIsRendered = true;
-        }
-    }
-
-    get startPosition(): Position {
-        return this.cells.find((cell) => cell.blockType === BlockType.Start)!.position;
-    }
-
-    private renderAllTiles(canvas: HTMLCanvasElement): void {
         const context = canvas.getContext('2d')!;
         context.strokeRect(0, 0, canvas.width, canvas.height);
         const tileSize = canvas.width / this.cols;
@@ -208,5 +197,9 @@ class Maze2d implements GameObject {
             const y = cell.position.y;
             context.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
         });
+    }
+
+    get startPosition(): Position {
+        return this.cells.find((cell) => cell.blockType === BlockType.Start)!.position;
     }
 }

@@ -12,6 +12,7 @@ export class GameObjectManager {
     }
     render(canvas) {
         const context = canvas.getContext('2d');
+        context.clearRect(0, 0, canvas.width, canvas.height);
         this.gameObjects.forEach(gameObject => gameObject.render(canvas));
     }
     deleteInactiveGameObjects() {
