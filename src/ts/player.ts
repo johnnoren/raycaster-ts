@@ -1,12 +1,12 @@
-import { GameObject, Status } from "./gameObject";
-import { Position } from "./maze2dFactory";
+import { GameObject, Status } from "./gameObject.js";
+import { BlockType, Maze2d, Maze2dFactory, Position } from "./maze2dFactory.js";
 
 export type Vector2 = { x: number; y: number; }
 
 type Matrix2 = [[number, number], [number, number]];
 
 export class Player implements GameObject {
-    constructor(public position: Position, public direction: Vector2, public status: Status) { }
+    constructor(public position: Position, public direction: Vector2, public status: Status, private maze: Maze2d) { }
 
     public update(): void {
     }
@@ -56,7 +56,10 @@ export class Player implements GameObject {
             x: this.position.x + distance * this.direction.x,
             y: this.position.y + distance * this.direction.y
         };
-        this.position = newPosition;
+
+        if (!this.maze.isBlockType(newPosition, BlockType.Wall)) {
+            this.position = newPosition;
+        }
     }
 
     private multiplyMatrixAndVector(matrix: Matrix2, vector: Vector2): Vector2 {

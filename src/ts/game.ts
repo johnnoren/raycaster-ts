@@ -26,12 +26,12 @@ export class Game {
         const mapRows = 21;
         const tileSize = this.mapCanvas.width / mapCols;
 
-        const map = new Maze2dFactory().createMaze(mapCols, mapRows);
+        const map = new Maze2dFactory().createMaze(mapCols, mapRows, tileSize);
         this.gameObjects.push(map);
 
         const playerStartingCell: Cell = map.getClosestCell({ x: Math.floor(mapCols / 2), y: Math.floor(mapRows / 2)}, BlockType.Path);
         const playerStartingPosition: Position = { x: playerStartingCell.position.x * tileSize + (tileSize / 2), y: playerStartingCell.position.y * tileSize + (tileSize / 2) };
-        this.player = new Player(playerStartingPosition, { x: 0, y: 1 }, Status.Active);
+        this.player = new Player(playerStartingPosition, { x: 0, y: 1 }, Status.Active, map);
         this.gameObjects.push(this.player);
 
         this.gameObjectsManager = new GameObjectManager();

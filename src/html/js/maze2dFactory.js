@@ -21,7 +21,7 @@ export class Maze2dFactory {
         this.isEven = (n) => { return n % 2 === 0; };
         this.isOdd = (n) => { return n % 2 === 1; };
     }
-    createMaze(cols, rows) {
+    createMaze(cols, rows, tileSize) {
         if (rows < 3 || cols < 3) {
             throw new Error("The maze must have at least 3 rows and 3 cols");
         }
@@ -31,7 +31,7 @@ export class Maze2dFactory {
         const cells = [];
         this.initializeCells(cols, rows, cells);
         this.generateMaze(cols, rows, cells);
-        return new Maze2d(cells, cols, rows, Status.Active);
+        return new Maze2dImpl(cells, cols, Status.Active, tileSize);
     }
     initializeCells(cols, rows, cells) {
         let counter = 0;
@@ -110,19 +110,24 @@ export class Maze2dFactory {
         return array;
     }
 }
-class Maze2d {
-    constructor(cells, cols, rows, status) {
-        this.currentStateIsRendered = false;
+class Maze2dImpl {
+    constructor(cells, cols, status, tileSize) {
         this.cells = cells;
         this.cols = cols;
-        this.rows = rows;
         this.status = status;
+        this.tileSize = tileSize;
+    }
+    isBlockType(position, blockType) {
+        const normalizedPosition = { x: Math.floor(position.x / this.tileSize), y: Math.floor(position.y / this.tileSize) };
+        console.log(normalizedPosition);
+        const cell = this.cells.find(cell => cell.position.x === normalizedPosition.x && cell.position.y === normalizedPosition.y);
+        return cell.blockType === blockType;
     }
     getClosestCell(position, blockType) {
-        const pathCells = this.cells.filter(cell => cell.blockType === blockType);
+        const cells = this.cells.filter(cell => cell.blockType === blockType);
         let closestPathCell = null;
         let closestDistance = Number.MAX_SAFE_INTEGER;
-        for (const cell of pathCells) {
+        for (const cell of cells) {
             const distance = Math.sqrt(Math.pow(cell.position.x - position.x, 2) +
                 Math.pow(cell.position.y - position.y, 2));
             if (distance < closestDistance) {

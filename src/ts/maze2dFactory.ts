@@ -31,7 +31,7 @@ export class Maze2dFactory {
     private readonly isEven = (n: number) => { return n % 2 === 0; };
     private readonly isOdd = (n: number) => { return n % 2 === 1; };
 
-    public createMaze(cols: number, rows: number): Maze2d {
+    public createMaze(cols: number, rows: number, tileSize: number): Maze2d {
         if (rows < 3 || cols < 3) {
             throw new Error("The maze must have at least 3 rows and 3 cols");
         }
@@ -41,7 +41,7 @@ export class Maze2dFactory {
         const cells: Cell[] = [];
         this.initializeCells(cols, rows, cells);
         this.generateMaze(cols, rows, cells);
-        return new Maze2d(cells, cols, rows, Status.Active);
+        return new Maze2dImpl(cells, cols, Status.Active, tileSize) as Maze2d;
     }
 
     private initializeCells(cols: number, rows: number, cells: Cell[]): void {
@@ -135,27 +135,40 @@ export class Maze2dFactory {
     }
 }
 
-class Maze2d implements GameObject {
+export interface Maze2d extends GameObject{
+    getClosestCell(position: Position, blockType: BlockType): Cell;
+
+    isBlockType(position: Position, blockType: BlockType): boolean;
+
+    get startPosition(): Position;
+}
+
+class Maze2dImpl implements Maze2d {
     private readonly cells: Cell[];
     private readonly cols: number;
-    private readonly rows: number;
     public status: Status;
-    private currentStateIsRendered = false;
+    private readonly tileSize: number;
 
-    constructor(cells: Cell[], cols: number, rows: number, status: Status) {
+    constructor(cells: Cell[], cols: number, status: Status, tileSize: number) {
         this.cells = cells;
         this.cols = cols;
-        this.rows = rows;
         this.status = status;
+        this.tileSize = tileSize;
+    }
+
+    public isBlockType(position: Position, blockType: BlockType): boolean {
+        const normalizedPosition: Position = { x: Math.floor(position.x / this.tileSize), y: Math.floor(position.y / this.tileSize) };
+        const cell = this.cells.find(cell => cell.position.x === normalizedPosition.x && cell.position.y === normalizedPosition.y);
+        return cell!.blockType === blockType;
     }
 
     public getClosestCell(position: Position, blockType: BlockType): Cell {
-        const pathCells = this.cells.filter(cell => cell.blockType === blockType);
+        const cells = this.cells.filter(cell => cell.blockType === blockType);
 
         let closestPathCell: Cell | null = null;
         let closestDistance = Number.MAX_SAFE_INTEGER;
 
-        for (const cell of pathCells) {
+        for (const cell of cells) {
             const distance = Math.sqrt(
                 Math.pow(cell.position.x - position.x!, 2) +
                 Math.pow(cell.position.y - position.y!, 2)

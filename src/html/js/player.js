@@ -1,8 +1,10 @@
+import { BlockType } from "./maze2dFactory.js";
 export class Player {
-    constructor(position, direction, status) {
+    constructor(position, direction, status, maze) {
         this.position = position;
         this.direction = direction;
         this.status = status;
+        this.maze = maze;
     }
     update() {
     }
@@ -44,7 +46,9 @@ export class Player {
             x: this.position.x + distance * this.direction.x,
             y: this.position.y + distance * this.direction.y
         };
-        this.position = newPosition;
+        if (!this.maze.isBlockType(newPosition, BlockType.Wall)) {
+            this.position = newPosition;
+        }
     }
     multiplyMatrixAndVector(matrix, vector) {
         const x = matrix[0][0] * vector.x + matrix[0][1] * vector.y;
