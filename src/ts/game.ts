@@ -13,6 +13,7 @@ export class Game {
     private gameLoopOptions: GameLoopOptions;
     private player: Player;
     private inputManager: InputManager;
+    private fovCanvas: HTMLCanvasElement;
 
     constructor() {
         this.mapCanvas = document.createElement('canvas');
@@ -46,6 +47,17 @@ export class Game {
         };
 
         this.gameLoop = new GameLoop(this.gameLoopOptions);
+
+        // ---- FOV ----
+        this.fovCanvas = document.createElement('canvas');
+        this.fovCanvas.width = 500;
+        this.fovCanvas.height = 500;
+        const fovDiv = document.getElementById('fov') as HTMLDivElement;
+        fovDiv.classList.add('d-flex', 'align-items-center', 'justify-content-center', 'h-100');
+        fovDiv.appendChild(this.fovCanvas);
+        const context = this.fovCanvas.getContext('2d')!;
+        context.fillStyle = 'rgba(0, 0, 0, 0.5)';
+        context.fillRect(0, 0, this.fovCanvas.width, this.fovCanvas.height);
     }
 
     public input(): void {

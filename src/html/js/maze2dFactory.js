@@ -119,7 +119,6 @@ class Maze2dImpl {
     }
     isBlockType(position, blockType) {
         const normalizedPosition = { x: Math.floor(position.x / this.tileSize), y: Math.floor(position.y / this.tileSize) };
-        console.log(normalizedPosition);
         const cell = this.cells.find(cell => cell.position.x === normalizedPosition.x && cell.position.y === normalizedPosition.y);
         return cell.blockType === blockType;
     }
