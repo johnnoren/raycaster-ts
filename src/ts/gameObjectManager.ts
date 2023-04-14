@@ -1,3 +1,4 @@
+import { GameCanvas } from "./gameCanvas.js";
 import { GameObject, Status } from "./gameObject.js";
 
 export class GameObjectManager {
@@ -12,15 +13,19 @@ export class GameObjectManager {
         this.deleteInactiveGameObjects();
     }
 
-    public render(canvas: HTMLCanvasElement): void {
-        const context = canvas.getContext('2d');
-        context!.clearRect(0, 0, canvas.width, canvas.height);
-        this.gameObjects.forEach(gameObject => gameObject.render(canvas));
+    public render(canvases: GameCanvas[]): void {
+        this.clearCanvases(canvases);
+        this.gameObjects.forEach(gameObject => gameObject.render(canvases));
     }
 
     private deleteInactiveGameObjects(): void {
         this.gameObjects = this.gameObjects.filter(gameObject => gameObject.status === Status.Active);
     }
 
-    
+    private clearCanvases(canvases: GameCanvas[]): void {
+        canvases.forEach(gameCanvas => {
+            const context = gameCanvas.canvas.getContext('2d');
+            context!.clearRect(0, 0, gameCanvas.canvas.width, gameCanvas.canvas.height);
+        });
+    }
 }

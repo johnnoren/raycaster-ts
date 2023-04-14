@@ -1,3 +1,5 @@
+import { GameCanvasId } from "./gameCanvas.js";
+import { GameCanvas } from "./gameCanvas.js";
 import { GameLoop, GameLoopOptions } from "./gameLoop.js";
 import { GameObject, Status } from "./gameObject.js";
 import { GameObjectManager } from "./gameObjectManager.js";
@@ -15,6 +17,7 @@ export class Game {
     private gameLoopOptions: GameLoopOptions;
     private player: Player;
     private inputManager: InputManager;
+    private canvases: GameCanvas[] = [];
     private fovCanvas: HTMLCanvasElement;
     private infoManager: InfoManager;
 
@@ -34,10 +37,11 @@ export class Game {
 
         const map = new Maze2dFactory().createMaze(mapCols, mapRows, tileSize);
         this.gameObjects.push(map);
+        this.canvases.push(new GameCanvas(GameCanvasId.map, this.mapCanvas));
 
 
         // ---- PLAYER ----
-        const playerStartingCell: Cell = map.getClosestCell({ x: Math.floor(mapCols / 2), y: Math.floor(mapRows / 2)}, BlockType.Path);
+        const playerStartingCell: Cell = map.getClosestCell({ x: Math.floor(mapCols / 2), y: Math.floor(mapRows / 2) }, BlockType.Path);
         const playerStartingPosition: Position = { x: playerStartingCell.position.x * tileSize + (tileSize / 2), y: playerStartingCell.position.y * tileSize + (tileSize / 2) };
         this.player = new Player(playerStartingPosition, { x: 0, y: 1 }, Status.Active, map);
         this.gameObjects.push(this.player);
@@ -46,7 +50,7 @@ export class Game {
         // ---- RAYS ----
         const rayOffset = Math.PI / 180;
         const numberOfRays = 60;
-        for (let i = 0-(numberOfRays/2); i < numberOfRays; i += 1) {
+        for (let i = 0 - (numberOfRays / 2); i < numberOfRays; i += 1) {
             const offset = i * rayOffset;
             const ray = new Ray(this.player, Status.Active, map, offset);
             this.gameObjects.push(ray);
@@ -82,6 +86,7 @@ export class Game {
         const context = this.fovCanvas.getContext('2d')!;
         context.fillStyle = 'rgba(0, 0, 0, 0.5)';
         context.fillRect(0, 0, this.fovCanvas.width, this.fovCanvas.height);
+        this.canvases.push(new GameCanvas(GameCanvasId.fov, this.fovCanvas));
     }
 
     public input(): void {
@@ -94,7 +99,7 @@ export class Game {
     }
 
     public render(): void {
-        this.gameObjectsManager.render(this.mapCanvas);
+        this.gameObjectsManager.render(this.canvases);
     }
 
     public start(): void {

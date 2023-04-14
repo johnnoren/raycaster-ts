@@ -1,3 +1,4 @@
+import { GameCanvas, GameCanvasId } from "./gameCanvas.js";
 import { GameObject, Status } from "./gameObject.js";
 import { BlockType, Maze2d, Maze2dFactory, Position } from "./maze2dFactory.js";
 
@@ -11,7 +12,21 @@ export class Player implements GameObject {
     public update(): void {
     }
 
-    public render(canvas: HTMLCanvasElement): void {
+    public render(gameCanvases: GameCanvas[]): void {
+        gameCanvases.forEach((gameCanvas) => {
+            switch (gameCanvas.id) {
+                case GameCanvasId.map:
+                    this.renderMap(gameCanvas.canvas);
+                    break;
+                case GameCanvasId.fov:
+                    
+                    break;
+                default: throw new Error("CanvasId not implemented: " + gameCanvas.id);
+            }
+        });
+    }
+
+    private renderMap(canvas: HTMLCanvasElement): void {
         const { x, y } = this.position;
         const context = canvas.getContext('2d');
         const radius = 5;

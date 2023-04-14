@@ -1,3 +1,4 @@
+import { GameCanvasId } from "./gameCanvas.js";
 import { Status } from "./gameObject.js";
 var CellType;
 (function (CellType) {
@@ -138,12 +139,23 @@ class Maze2dImpl {
     }
     update() {
     }
-    render(canvas) {
+    render(gameCanvases) {
+        gameCanvases.forEach((gameCanvas) => {
+            switch (gameCanvas.id) {
+                case GameCanvasId.map:
+                    this.renderMap(gameCanvas.canvas);
+                    break;
+                case GameCanvasId.fov:
+                    break;
+                default: throw new Error("CanvasId not implemented: " + gameCanvas.id);
+            }
+        });
+    }
+    renderMap(canvas) {
         const context = canvas.getContext('2d');
         context.strokeRect(0, 0, canvas.width, canvas.height);
         const tileSize = canvas.width / this.cols;
-        const grid = this.cells;
-        grid.forEach((cell) => {
+        this.cells.forEach((cell) => {
             switch (cell.blockType) {
                 case BlockType.Wall:
                     context.fillStyle = 'black';
@@ -157,9 +169,7 @@ class Maze2dImpl {
                 default:
                     throw new Error(`BlockType in cell not implemented: ${cell.blockType}`);
             }
-            const x = cell.position.x;
-            const y = cell.position.y;
-            context.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
+            context.fillRect(cell.position.x * tileSize, cell.position.y * tileSize, tileSize, tileSize);
         });
     }
     get startPosition() {

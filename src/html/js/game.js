@@ -1,3 +1,5 @@
+import { GameCanvasId } from "./gameCanvas.js";
+import { GameCanvas } from "./gameCanvas.js";
 import { GameLoop } from "./gameLoop.js";
 import { Status } from "./gameObject.js";
 import { GameObjectManager } from "./gameObjectManager.js";
@@ -9,6 +11,7 @@ import { Ray } from "./ray.js";
 export class Game {
     constructor() {
         this.gameObjects = [];
+        this.canvases = [];
         this.mapCanvas = document.createElement('canvas');
         this.mapCanvas.width = 500;
         this.mapCanvas.height = 500;
@@ -20,6 +23,7 @@ export class Game {
         const tileSize = this.mapCanvas.width / mapCols;
         const map = new Maze2dFactory().createMaze(mapCols, mapRows, tileSize);
         this.gameObjects.push(map);
+        this.canvases.push(new GameCanvas(GameCanvasId.map, this.mapCanvas));
         const playerStartingCell = map.getClosestCell({ x: Math.floor(mapCols / 2), y: Math.floor(mapRows / 2) }, BlockType.Path);
         const playerStartingPosition = { x: playerStartingCell.position.x * tileSize + (tileSize / 2), y: playerStartingCell.position.y * tileSize + (tileSize / 2) };
         this.player = new Player(playerStartingPosition, { x: 0, y: 1 }, Status.Active, map);
@@ -50,6 +54,7 @@ export class Game {
         const context = this.fovCanvas.getContext('2d');
         context.fillStyle = 'rgba(0, 0, 0, 0.5)';
         context.fillRect(0, 0, this.fovCanvas.width, this.fovCanvas.height);
+        this.canvases.push(new GameCanvas(GameCanvasId.fov, this.fovCanvas));
     }
     input() {
         this.inputManager.handleInput();
@@ -59,7 +64,7 @@ export class Game {
         this.infoManager.update();
     }
     render() {
-        this.gameObjectsManager.render(this.mapCanvas);
+        this.gameObjectsManager.render(this.canvases);
     }
     start() {
         this.gameLoop.start();
