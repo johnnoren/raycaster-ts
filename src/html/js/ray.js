@@ -1,17 +1,22 @@
 import { BlockType } from "./maze2dFactory.js";
 export class Ray {
-    constructor(player, status, map) {
+    constructor(player, status, map, angle) {
         this.player = player;
         this.status = status;
         this.map = map;
+        this.angle = angle;
     }
     update() { }
     render(canvas) {
         const context = canvas.getContext("2d");
         const { x: startX, y: startY } = this.player.position;
         const { x: dirX, y: dirY } = this.player.direction;
-        const distanceToWall = this.getDistanceToWall(startX, startY, dirX, dirY, canvas);
-        this.drawRay(context, startX, startY, dirX, dirY, distanceToWall);
+        const cos = Math.cos(this.angle);
+        const sin = Math.sin(this.angle);
+        const dirXOffset = dirX * cos - dirY * sin;
+        const dirYOffset = dirX * sin + dirY * cos;
+        const distanceToWall = this.getDistanceToWall(startX, startY, dirXOffset, dirYOffset, canvas);
+        this.drawRay(context, startX, startY, dirXOffset, dirYOffset, distanceToWall);
     }
     drawRay(context, startX, startY, dirX, dirY, distance) {
         context.beginPath();

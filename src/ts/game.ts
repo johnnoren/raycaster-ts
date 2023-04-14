@@ -17,7 +17,6 @@ export class Game {
     private inputManager: InputManager;
     private fovCanvas: HTMLCanvasElement;
     private infoManager: InfoManager;
-    private ray: Ray;
 
     constructor() {
 
@@ -44,9 +43,14 @@ export class Game {
         this.gameObjects.push(this.player);
 
 
-        // ---- RAY ----
-        this.ray = new Ray(this.player, Status.Active, map);
-        this.gameObjects.push(this.ray);
+        // ---- RAYS ----
+        const rayOffset = Math.PI / 180;
+        const numberOfRays = 60;
+        for (let i = 0-(numberOfRays/2); i < numberOfRays; i += 1) {
+            const offset = i * rayOffset;
+            const ray = new Ray(this.player, Status.Active, map, offset);
+            this.gameObjects.push(ray);
+        }
 
         // ---- GAME OBJECT MANAGER ----
         this.gameObjectsManager = new GameObjectManager();

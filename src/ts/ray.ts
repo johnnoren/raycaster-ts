@@ -3,7 +3,7 @@ import { BlockType, Maze2d } from "./maze2dFactory.js";
 import { Player, Vector2 } from "./player.js";
 
 export class Ray implements GameObject {
-  constructor(private player: Player, public status: Status, private map: Maze2d) {}
+  constructor(private player: Player, public status: Status, private map: Maze2d, private angle: number) {}
 
   update(): void {}
 
@@ -12,10 +12,17 @@ export class Ray implements GameObject {
     const { x: startX, y: startY } = this.player.position;
     const { x: dirX, y: dirY } = this.player.direction;
 
-    
-    const distanceToWall = this.getDistanceToWall(startX, startY, dirX, dirY, canvas);
+    // Calculate the direction of the ray, offset by the angle
+    const cos = Math.cos(this.angle);
+    const sin = Math.sin(this.angle);
+    const dirXOffset = dirX * cos - dirY * sin;
+    const dirYOffset = dirX * sin + dirY * cos;
 
-    this.drawRay(context!, startX, startY, dirX, dirY, distanceToWall);
+    // Find the distance to the nearest wall in the direction of the ray
+    const distanceToWall = this.getDistanceToWall(startX, startY, dirXOffset, dirYOffset, canvas);
+
+    // Draw the ray on the canvas
+    this.drawRay(context!, startX, startY, dirXOffset, dirYOffset, distanceToWall);
   }
 
   private drawRay(context: CanvasRenderingContext2D, startX: number, startY: number, dirX: number, dirY: number, distance: number): void {
@@ -26,8 +33,8 @@ export class Ray implements GameObject {
     context!.stroke();
   }
 
-    private getDistanceToWall(startX: number, startY: number, dirX: number, dirY: number, canvas: HTMLCanvasElement): number {
-        let distance = 0;
+  private getDistanceToWall(startX: number, startY: number, dirX: number, dirY: number, canvas: HTMLCanvasElement): number {
+    let distance = 0;
     let hitWall = false;
     while (!hitWall && distance < canvas.width) {
       const x = startX + dirX * distance;
@@ -39,5 +46,5 @@ export class Ray implements GameObject {
       }
     }
     return distance;
-}
+  }
 }

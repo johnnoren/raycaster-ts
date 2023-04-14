@@ -24,8 +24,13 @@ export class Game {
         const playerStartingPosition = { x: playerStartingCell.position.x * tileSize + (tileSize / 2), y: playerStartingCell.position.y * tileSize + (tileSize / 2) };
         this.player = new Player(playerStartingPosition, { x: 0, y: 1 }, Status.Active, map);
         this.gameObjects.push(this.player);
-        this.ray = new Ray(this.player, Status.Active, map);
-        this.gameObjects.push(this.ray);
+        const rayOffset = Math.PI / 180;
+        const numberOfRays = 60;
+        for (let i = 0 - (numberOfRays / 2); i < numberOfRays; i += 1) {
+            const offset = i * rayOffset;
+            const ray = new Ray(this.player, Status.Active, map, offset);
+            this.gameObjects.push(ray);
+        }
         this.gameObjectsManager = new GameObjectManager();
         this.gameObjects.forEach(gameObject => this.gameObjectsManager.add(gameObject));
         this.inputManager = new InputManager(this.player);
