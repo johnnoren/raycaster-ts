@@ -5,6 +5,7 @@ import { InfoManager } from "./infoManager.js";
 import { InputManager } from "./inputManager.js";
 import { BlockType, Maze2dFactory, Cell, Position } from "./maze2dFactory.js";
 import { Player } from "./player.js";
+import { Ray } from "./ray.js";
 
 export class Game {
     private gameObjects: GameObject[] = [];
@@ -16,8 +17,11 @@ export class Game {
     private inputManager: InputManager;
     private fovCanvas: HTMLCanvasElement;
     private infoManager: InfoManager;
+    private ray: Ray;
 
     constructor() {
+
+        // ---- MAP ----
         this.mapCanvas = document.createElement('canvas');
         this.mapCanvas.width = 500;
         this.mapCanvas.height = 500;
@@ -32,22 +36,33 @@ export class Game {
         const map = new Maze2dFactory().createMaze(mapCols, mapRows, tileSize);
         this.gameObjects.push(map);
 
+
+        // ---- PLAYER ----
         const playerStartingCell: Cell = map.getClosestCell({ x: Math.floor(mapCols / 2), y: Math.floor(mapRows / 2)}, BlockType.Path);
         const playerStartingPosition: Position = { x: playerStartingCell.position.x * tileSize + (tileSize / 2), y: playerStartingCell.position.y * tileSize + (tileSize / 2) };
         this.player = new Player(playerStartingPosition, { x: 0, y: 1 }, Status.Active, map);
         this.gameObjects.push(this.player);
 
+
+        // ---- FPS ----
+        this.ray = new Ray(this.player, Status.Active);
+        this.gameObjects.push(this.ray);
+
+        // ---- GAME OBJECT MANAGER ----
         this.gameObjectsManager = new GameObjectManager();
         this.gameObjects.forEach(gameObject => this.gameObjectsManager.add(gameObject));
 
+
+        // ---- INPUT MANAGER ----
         this.inputManager = new InputManager(this.player);
 
+
+        // ---- GAME LOOP ----
         this.gameLoopOptions = {
             input: this.input.bind(this),
             update: this.update.bind(this),
             render: this.render.bind(this)
         };
-
         this.gameLoop = new GameLoop(this.gameLoopOptions);
 
         // ---- FPS ----

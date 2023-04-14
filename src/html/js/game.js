@@ -5,6 +5,7 @@ import { InfoManager } from "./infoManager.js";
 import { InputManager } from "./inputManager.js";
 import { BlockType, Maze2dFactory } from "./maze2dFactory.js";
 import { Player } from "./player.js";
+import { Ray } from "./ray.js";
 export class Game {
     constructor() {
         this.gameObjects = [];
@@ -23,6 +24,8 @@ export class Game {
         const playerStartingPosition = { x: playerStartingCell.position.x * tileSize + (tileSize / 2), y: playerStartingCell.position.y * tileSize + (tileSize / 2) };
         this.player = new Player(playerStartingPosition, { x: 0, y: 1 }, Status.Active, map);
         this.gameObjects.push(this.player);
+        this.ray = new Ray(this.player, Status.Active);
+        this.gameObjects.push(this.ray);
         this.gameObjectsManager = new GameObjectManager();
         this.gameObjects.forEach(gameObject => this.gameObjectsManager.add(gameObject));
         this.inputManager = new InputManager(this.player);
