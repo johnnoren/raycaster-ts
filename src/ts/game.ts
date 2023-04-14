@@ -44,8 +44,8 @@ export class Game {
         this.gameObjects.push(this.player);
 
 
-        // ---- FPS ----
-        this.ray = new Ray(this.player, Status.Active);
+        // ---- RAY ----
+        this.ray = new Ray(this.player, Status.Active, map);
         this.gameObjects.push(this.ray);
 
         // ---- GAME OBJECT MANAGER ----

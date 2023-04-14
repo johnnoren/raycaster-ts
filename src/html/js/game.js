@@ -24,7 +24,7 @@ export class Game {
         const playerStartingPosition = { x: playerStartingCell.position.x * tileSize + (tileSize / 2), y: playerStartingCell.position.y * tileSize + (tileSize / 2) };
         this.player = new Player(playerStartingPosition, { x: 0, y: 1 }, Status.Active, map);
         this.gameObjects.push(this.player);
-        this.ray = new Ray(this.player, Status.Active);
+        this.ray = new Ray(this.player, Status.Active, map);
         this.gameObjects.push(this.ray);
         this.gameObjectsManager = new GameObjectManager();
         this.gameObjects.forEach(gameObject => this.gameObjectsManager.add(gameObject));
