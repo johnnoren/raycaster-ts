@@ -72,7 +72,7 @@ export class Ray implements GameObject {
             if (this.map.isBlockType({ x, y }, BlockType.Wall)) {
                 hitWall = true;
             } else {
-                distance++;
+                distance += 0.1;
             }
         }
         return distance;

@@ -68,7 +68,7 @@ export class Ray {
                 hitWall = true;
             }
             else {
-                distance++;
+                distance += 0.1;
             }
         }
         return distance;

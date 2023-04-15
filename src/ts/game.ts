@@ -64,7 +64,7 @@ export class Game {
 
         // ---- RAYS ----
         const playerFov = 90 * (Math.PI / 180);
-        const numberOfRays = 480;
+        const numberOfRays = 240;
         const canvasWidth = this.fovCanvas.width;
         const distanceToProjectionPlane = (canvasWidth / 2) / Math.tan(playerFov / 2);
         const rayOffset = playerFov / (numberOfRays - 1);
