@@ -51,11 +51,11 @@ export class Game {
 
 
         // ---- RAYS ----
-        const rayOffset = Math.PI / 180;
-        const numberOfRays = 60;
+        const rayOffset = Math.PI / 720;
+        const numberOfRays = 240;
         for (let i = 0 - (numberOfRays / 2); i < numberOfRays; i += 1) {
             const offset = i * rayOffset;
-            const ray = new Ray(this.player, Status.Active, map, offset);
+            const ray = new Ray(this.player, Status.Active, map, offset, i, numberOfRays);
             this.gameObjects.push(ray);
         }
 
