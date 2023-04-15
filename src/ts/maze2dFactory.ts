@@ -1,4 +1,4 @@
-import { GameCanvas, GameCanvasId } from "./gameCanvas.js";
+import { CanvasId } from "./game.js";
 import { GameObject, Status } from "./gameObject.js";
 
 export type Position = { x: number, y: number };
@@ -187,16 +187,16 @@ class Maze2dImpl implements Maze2d {
     update(): void {
 
     }
-    render(gameCanvases: GameCanvas[]): void {
-        gameCanvases.forEach((gameCanvas) => {
-            switch (gameCanvas.id) {
-                case GameCanvasId.map:
-                    this.renderMap(gameCanvas.canvas);
+    render(canvases: HTMLCanvasElement[]): void {
+        canvases.forEach((canvas) => {
+            switch (canvas.id) {
+                case CanvasId.map:
+                    this.renderMap(canvas);
                     break;
-                case GameCanvasId.fov:
+                case CanvasId.fov:
                     
                     break;
-                default: throw new Error("CanvasId not implemented: " + gameCanvas.id);
+                default: throw new Error("CanvasId not implemented: " + canvas.id);
             }
         });
     }

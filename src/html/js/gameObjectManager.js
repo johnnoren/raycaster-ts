@@ -18,9 +18,9 @@ export class GameObjectManager {
         this.gameObjects = this.gameObjects.filter(gameObject => gameObject.status === Status.Active);
     }
     clearCanvases(canvases) {
-        canvases.forEach(gameCanvas => {
-            const context = gameCanvas.canvas.getContext('2d');
-            context.clearRect(0, 0, gameCanvas.canvas.width, gameCanvas.canvas.height);
+        canvases.forEach(canvas => {
+            const context = canvas.getContext('2d');
+            context.clearRect(0, 0, canvas.width, canvas.height);
         });
     }
 }

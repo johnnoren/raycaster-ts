@@ -1,4 +1,4 @@
-import { GameCanvasId } from "./gameCanvas.js";
+import { CanvasId } from "./game.js";
 import { BlockType } from "./maze2dFactory.js";
 export class Ray {
     constructor(player, status, map, angle) {
@@ -6,18 +6,19 @@ export class Ray {
         this.status = status;
         this.map = map;
         this.angle = angle;
+        this.distanceToWall = 0;
     }
     update() { }
-    render(gameCanvases) {
-        gameCanvases.forEach((gameCanvas) => {
-            switch (gameCanvas.id) {
-                case GameCanvasId.map:
-                    this.renderMap(gameCanvas.canvas);
+    render(canvases) {
+        canvases.forEach((canvas) => {
+            switch (canvas.id) {
+                case CanvasId.map:
+                    this.renderMap(canvas);
                     break;
-                case GameCanvasId.fov:
-                    this.renderFov(gameCanvas.canvas);
+                case CanvasId.fov:
+                    this.renderFov(canvas);
                     break;
-                default: throw new Error("CanvasId not implemented: " + gameCanvas.id);
+                default: throw new Error("CanvasId not implemented: " + canvas.id);
             }
         });
     }
@@ -26,10 +27,16 @@ export class Ray {
         const { x: startX, y: startY } = this.player.position;
         const { x: dirX, y: dirY } = this.player.direction;
         const { dirXOffset, dirYOffset } = this.getOffsetAdjustedDirection(dirX, dirY);
-        const distanceToWall = this.getDistanceToWall(startX, startY, dirXOffset, dirYOffset, mapCanvas);
-        this.drawRayOnMap(mapCanvasContext, startX, startY, dirXOffset, dirYOffset, distanceToWall);
+        this.distanceToWall = this.getDistanceToWall(startX, startY, dirXOffset, dirYOffset, mapCanvas);
+        this.drawRayOnMap(mapCanvasContext, startX, startY, dirXOffset, dirYOffset, this.distanceToWall);
     }
     renderFov(fovCanvas) {
+        const fovCanvasContext = fovCanvas.getContext('2d');
+        const distanceToWall = this.distanceToWall;
+        const distanceToWallAdjusted = distanceToWall * Math.cos(this.angle);
+        const wallHeight = fovCanvas.height / distanceToWallAdjusted;
+        fovCanvasContext.fillStyle = "rgba(255, 0, 0, 0.5)";
+        fovCanvasContext.fillRect(0, fovCanvas.height / 2 - wallHeight / 2, fovCanvas.width, wallHeight);
     }
     getOffsetAdjustedDirection(dirX, dirY) {
         const cos = Math.cos(this.angle);

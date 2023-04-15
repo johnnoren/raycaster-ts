@@ -1,5 +1,3 @@
-import { GameCanvasId } from "./gameCanvas.js";
-import { GameCanvas } from "./gameCanvas.js";
 import { GameLoop } from "./gameLoop.js";
 import { Status } from "./gameObject.js";
 import { GameObjectManager } from "./gameObjectManager.js";
@@ -8,6 +6,11 @@ import { InputManager } from "./inputManager.js";
 import { BlockType, Maze2dFactory } from "./maze2dFactory.js";
 import { Player } from "./player.js";
 import { Ray } from "./ray.js";
+export var CanvasId;
+(function (CanvasId) {
+    CanvasId["map"] = "map";
+    CanvasId["fov"] = "fov";
+})(CanvasId || (CanvasId = {}));
 export class Game {
     constructor() {
         this.gameObjects = [];
@@ -15,6 +18,7 @@ export class Game {
         this.mapCanvas = document.createElement('canvas');
         this.mapCanvas.width = 500;
         this.mapCanvas.height = 500;
+        this.mapCanvas.id = CanvasId.map;
         const mapDiv = document.getElementById('map');
         mapDiv.classList.add('d-flex', 'align-items-center', 'justify-content-center', 'h-100');
         mapDiv.appendChild(this.mapCanvas);
@@ -23,7 +27,7 @@ export class Game {
         const tileSize = this.mapCanvas.width / mapCols;
         const map = new Maze2dFactory().createMaze(mapCols, mapRows, tileSize);
         this.gameObjects.push(map);
-        this.canvases.push(new GameCanvas(GameCanvasId.map, this.mapCanvas));
+        this.canvases.push(this.mapCanvas);
         const playerStartingCell = map.getClosestCell({ x: Math.floor(mapCols / 2), y: Math.floor(mapRows / 2) }, BlockType.Path);
         const playerStartingPosition = { x: playerStartingCell.position.x * tileSize + (tileSize / 2), y: playerStartingCell.position.y * tileSize + (tileSize / 2) };
         this.player = new Player(playerStartingPosition, { x: 0, y: 1 }, Status.Active, map);
@@ -38,23 +42,24 @@ export class Game {
         this.gameObjectsManager = new GameObjectManager();
         this.gameObjects.forEach(gameObject => this.gameObjectsManager.add(gameObject));
         this.inputManager = new InputManager(this.player);
-        this.gameLoopOptions = {
+        const gameLoopOptions = {
             input: this.input.bind(this),
             update: this.update.bind(this),
             render: this.render.bind(this)
         };
-        this.gameLoop = new GameLoop(this.gameLoopOptions);
+        this.gameLoop = new GameLoop(gameLoopOptions);
         this.infoManager = new InfoManager(this.gameLoop);
         this.fovCanvas = document.createElement('canvas');
         this.fovCanvas.width = 500;
         this.fovCanvas.height = 500;
+        this.fovCanvas.id = CanvasId.fov;
         const fovDiv = document.getElementById('fov');
         fovDiv.classList.add('d-flex', 'align-items-center', 'justify-content-center', 'h-100');
         fovDiv.appendChild(this.fovCanvas);
         const context = this.fovCanvas.getContext('2d');
         context.fillStyle = 'rgba(0, 0, 0, 0.5)';
         context.fillRect(0, 0, this.fovCanvas.width, this.fovCanvas.height);
-        this.canvases.push(new GameCanvas(GameCanvasId.fov, this.fovCanvas));
+        this.canvases.push(this.fovCanvas);
     }
     input() {
         this.inputManager.handleInput();

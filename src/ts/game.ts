@@ -1,6 +1,4 @@
-import { GameCanvasId } from "./gameCanvas.js";
-import { GameCanvas } from "./gameCanvas.js";
-import { GameLoop, GameLoopOptions } from "./gameLoop.js";
+import { GameLoop } from "./gameLoop.js";
 import { GameObject, Status } from "./gameObject.js";
 import { GameObjectManager } from "./gameObjectManager.js";
 import { InfoManager } from "./infoManager.js";
@@ -9,15 +7,19 @@ import { BlockType, Maze2dFactory, Cell, Position } from "./maze2dFactory.js";
 import { Player } from "./player.js";
 import { Ray } from "./ray.js";
 
+export enum CanvasId {
+    map = "map",
+    fov = "fov"
+}
+
 export class Game {
     private gameObjects: GameObject[] = [];
     private mapCanvas: HTMLCanvasElement;
     private gameLoop: GameLoop;
     private gameObjectsManager: GameObjectManager;
-    private gameLoopOptions: GameLoopOptions;
     private player: Player;
     private inputManager: InputManager;
-    private canvases: GameCanvas[] = [];
+    private canvases: HTMLCanvasElement[] = [];
     private fovCanvas: HTMLCanvasElement;
     private infoManager: InfoManager;
 
@@ -27,6 +29,7 @@ export class Game {
         this.mapCanvas = document.createElement('canvas');
         this.mapCanvas.width = 500;
         this.mapCanvas.height = 500;
+        this.mapCanvas.id = CanvasId.map;
         const mapDiv = document.getElementById('map') as HTMLDivElement;
         mapDiv.classList.add('d-flex', 'align-items-center', 'justify-content-center', 'h-100');
         mapDiv.appendChild(this.mapCanvas);
@@ -37,7 +40,7 @@ export class Game {
 
         const map = new Maze2dFactory().createMaze(mapCols, mapRows, tileSize);
         this.gameObjects.push(map);
-        this.canvases.push(new GameCanvas(GameCanvasId.map, this.mapCanvas));
+        this.canvases.push(this.mapCanvas);
 
 
         // ---- PLAYER ----
@@ -66,12 +69,12 @@ export class Game {
 
 
         // ---- GAME LOOP ----
-        this.gameLoopOptions = {
+        const gameLoopOptions = {
             input: this.input.bind(this),
             update: this.update.bind(this),
             render: this.render.bind(this)
         };
-        this.gameLoop = new GameLoop(this.gameLoopOptions);
+        this.gameLoop = new GameLoop(gameLoopOptions);
 
         // ---- FPS ----
         this.infoManager = new InfoManager(this.gameLoop);
@@ -80,13 +83,14 @@ export class Game {
         this.fovCanvas = document.createElement('canvas');
         this.fovCanvas.width = 500;
         this.fovCanvas.height = 500;
+        this.fovCanvas.id = CanvasId.fov;
         const fovDiv = document.getElementById('fov') as HTMLDivElement;
         fovDiv.classList.add('d-flex', 'align-items-center', 'justify-content-center', 'h-100');
         fovDiv.appendChild(this.fovCanvas);
         const context = this.fovCanvas.getContext('2d')!;
         context.fillStyle = 'rgba(0, 0, 0, 0.5)';
         context.fillRect(0, 0, this.fovCanvas.width, this.fovCanvas.height);
-        this.canvases.push(new GameCanvas(GameCanvasId.fov, this.fovCanvas));
+        this.canvases.push(this.fovCanvas);
     }
 
     public input(): void {
