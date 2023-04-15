@@ -32,14 +32,28 @@ export class Game {
         const playerStartingPosition = { x: playerStartingCell.position.x * tileSize + (tileSize / 2), y: playerStartingCell.position.y * tileSize + (tileSize / 2) };
         this.player = new Player(playerStartingPosition, { x: 0, y: 1 }, Status.Active, map);
         this.gameObjects.push(this.player);
+        this.fovCanvas = document.createElement('canvas');
+        this.fovCanvas.width = 500;
+        this.fovCanvas.height = 500;
+        this.fovCanvas.id = CanvasId.fov;
+        const fovDiv = document.getElementById('fov');
+        fovDiv.classList.add('d-flex', 'align-items-center', 'justify-content-center', 'h-100');
+        fovDiv.appendChild(this.fovCanvas);
+        const context = this.fovCanvas.getContext('2d');
+        context.fillStyle = 'rgba(0, 0, 0, 0.5)';
+        context.fillRect(0, 0, this.fovCanvas.width, this.fovCanvas.height);
+        this.canvases.push(this.fovCanvas);
         const playerFov = 90 * (Math.PI / 180);
-        const numberOfRays = 60;
+        const numberOfRays = 480;
+        const canvasWidth = this.fovCanvas.width;
+        const distanceToProjectionPlane = (canvasWidth / 2) / Math.tan(playerFov / 2);
         const rayOffset = playerFov / (numberOfRays - 1);
         const centralRayIndex = Math.floor(numberOfRays / 2);
         for (let i = 0; i < numberOfRays; i += 1) {
             const offset = -playerFov / 2 + i * rayOffset;
             const color = (i === centralRayIndex) ? "red" : "yellow";
-            const ray = new Ray(this.player, Status.Active, map, offset, i, numberOfRays, color);
+            const blockSize = 32;
+            const ray = new Ray(this.player, Status.Active, map, offset, i, numberOfRays, color, distanceToProjectionPlane, blockSize);
             this.gameObjects.push(ray);
         }
         this.gameObjectsManager = new GameObjectManager();
@@ -52,17 +66,6 @@ export class Game {
         };
         this.gameLoop = new GameLoop(gameLoopOptions);
         this.infoManager = new InfoManager(this.gameLoop);
-        this.fovCanvas = document.createElement('canvas');
-        this.fovCanvas.width = 500;
-        this.fovCanvas.height = 500;
-        this.fovCanvas.id = CanvasId.fov;
-        const fovDiv = document.getElementById('fov');
-        fovDiv.classList.add('d-flex', 'align-items-center', 'justify-content-center', 'h-100');
-        fovDiv.appendChild(this.fovCanvas);
-        const context = this.fovCanvas.getContext('2d');
-        context.fillStyle = 'rgba(0, 0, 0, 0.5)';
-        context.fillRect(0, 0, this.fovCanvas.width, this.fovCanvas.height);
-        this.canvases.push(this.fovCanvas);
     }
     input() {
         this.inputManager.handleInput();

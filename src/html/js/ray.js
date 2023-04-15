@@ -1,7 +1,7 @@
 import { CanvasId } from "./game.js";
 import { BlockType } from "./maze2dFactory.js";
 export class Ray {
-    constructor(player, status, map, angle, rayNumber, numberOfRays, color) {
+    constructor(player, status, map, angle, rayNumber, numberOfRays, color, distanceToProjectionPlane, blockSize) {
         this.player = player;
         this.status = status;
         this.map = map;
@@ -9,8 +9,9 @@ export class Ray {
         this.rayNumber = rayNumber;
         this.numberOfRays = numberOfRays;
         this.color = color;
+        this.distanceToProjectionPlane = distanceToProjectionPlane;
+        this.blockSize = blockSize;
         this.distanceToWall = 0;
-        this.wallScaleFactor = 8;
     }
     update() { }
     render(canvases) {
@@ -36,8 +37,8 @@ export class Ray {
     }
     renderFov(fovCanvas) {
         const fovCanvasContext = fovCanvas.getContext('2d');
-        const distanceToWall = this.distanceToWall;
-        const wallHeight = (fovCanvas.height / distanceToWall) * this.wallScaleFactor;
+        const correctedDistanceToWall = this.distanceToWall * Math.cos(this.angle);
+        const wallHeight = (this.blockSize / correctedDistanceToWall) * this.distanceToProjectionPlane;
         const wallColumnWidth = fovCanvas.width / this.numberOfRays;
         const wallColumnX = this.rayNumber * wallColumnWidth;
         fovCanvasContext.fillStyle = "rgba(255, 0, 0, 0.5)";

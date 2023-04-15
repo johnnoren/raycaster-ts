@@ -5,9 +5,8 @@ import { Player, Vector2 } from "./player.js";
 
 export class Ray implements GameObject {
     private distanceToWall: number = 0;
-    private wallScaleFactor: number = 8;
 
-    constructor(private player: Player, public status: Status, private map: Maze2d, private angle: number, private rayNumber: number, private numberOfRays: number, private color: string) { }
+    constructor(private player: Player, public status: Status, private map: Maze2d, private angle: number, private rayNumber: number, private numberOfRays: number, private color: string, private distanceToProjectionPlane: number, private blockSize: number) { }
 
     update(): void { }
 
@@ -38,14 +37,15 @@ export class Ray implements GameObject {
 
     private renderFov(fovCanvas: HTMLCanvasElement): void {
         const fovCanvasContext = fovCanvas.getContext('2d');
-        const distanceToWall = this.distanceToWall;
-        const wallHeight = (fovCanvas.height / distanceToWall) * this.wallScaleFactor;
+        const correctedDistanceToWall = this.distanceToWall * Math.cos(this.angle);
+        const wallHeight = (this.blockSize / correctedDistanceToWall) * this.distanceToProjectionPlane;
         const wallColumnWidth = fovCanvas.width / this.numberOfRays;
         const wallColumnX = this.rayNumber * wallColumnWidth;
     
         fovCanvasContext!.fillStyle = "rgba(255, 0, 0, 0.5)";
         fovCanvasContext!.fillRect(wallColumnX, fovCanvas.height / 2 - wallHeight / 2, wallColumnWidth, wallHeight);
     }
+        
     
     private getOffsetAdjustedDirection(dirX: number, dirY: number) {
         const cos = Math.cos(this.angle);
