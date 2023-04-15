@@ -1,13 +1,14 @@
 import { CanvasId } from "./game.js";
 import { BlockType } from "./maze2dFactory.js";
 export class Ray {
-    constructor(player, status, map, angle, rayNumber, numberOfRays) {
+    constructor(player, status, map, angle, rayNumber, numberOfRays, color) {
         this.player = player;
         this.status = status;
         this.map = map;
         this.angle = angle;
         this.rayNumber = rayNumber;
         this.numberOfRays = numberOfRays;
+        this.color = color;
         this.distanceToWall = 0;
         this.wallScaleFactor = 8;
     }
@@ -36,8 +37,7 @@ export class Ray {
     renderFov(fovCanvas) {
         const fovCanvasContext = fovCanvas.getContext('2d');
         const distanceToWall = this.distanceToWall;
-        const distanceToWallAdjusted = distanceToWall * Math.cos(this.angle);
-        const wallHeight = (fovCanvas.height / distanceToWallAdjusted) * this.wallScaleFactor;
+        const wallHeight = (fovCanvas.height / distanceToWall) * this.wallScaleFactor;
         const wallColumnWidth = fovCanvas.width / this.numberOfRays;
         const wallColumnX = this.rayNumber * wallColumnWidth;
         fovCanvasContext.fillStyle = "rgba(255, 0, 0, 0.5)";
@@ -54,7 +54,7 @@ export class Ray {
         context.beginPath();
         context.moveTo(startX, startY);
         context.lineTo(startX + dirX * distance, startY + dirY * distance);
-        context.strokeStyle = "red";
+        context.strokeStyle = this.color;
         context.stroke();
     }
     getDistanceToWall(startX, startY, dirX, dirY, canvas) {

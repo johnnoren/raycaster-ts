@@ -7,7 +7,7 @@ export class Ray implements GameObject {
     private distanceToWall: number = 0;
     private wallScaleFactor: number = 8;
 
-    constructor(private player: Player, public status: Status, private map: Maze2d, private angle: number, private rayNumber: number, private numberOfRays: number) { }
+    constructor(private player: Player, public status: Status, private map: Maze2d, private angle: number, private rayNumber: number, private numberOfRays: number, private color: string) { }
 
     update(): void { }
 
@@ -39,8 +39,7 @@ export class Ray implements GameObject {
     private renderFov(fovCanvas: HTMLCanvasElement): void {
         const fovCanvasContext = fovCanvas.getContext('2d');
         const distanceToWall = this.distanceToWall;
-        const distanceToWallAdjusted = distanceToWall * Math.cos(this.angle);
-        const wallHeight = (fovCanvas.height / distanceToWallAdjusted) * this.wallScaleFactor;
+        const wallHeight = (fovCanvas.height / distanceToWall) * this.wallScaleFactor;
         const wallColumnWidth = fovCanvas.width / this.numberOfRays;
         const wallColumnX = this.rayNumber * wallColumnWidth;
     
@@ -48,8 +47,6 @@ export class Ray implements GameObject {
         fovCanvasContext!.fillRect(wallColumnX, fovCanvas.height / 2 - wallHeight / 2, wallColumnWidth, wallHeight);
     }
     
-    
-
     private getOffsetAdjustedDirection(dirX: number, dirY: number) {
         const cos = Math.cos(this.angle);
         const sin = Math.sin(this.angle);
@@ -62,7 +59,7 @@ export class Ray implements GameObject {
         context!.beginPath();
         context!.moveTo(startX, startY);
         context!.lineTo(startX + dirX * distance, startY + dirY * distance);
-        context!.strokeStyle = "red";
+        context!.strokeStyle = this.color;
         context!.stroke();
     }
 
