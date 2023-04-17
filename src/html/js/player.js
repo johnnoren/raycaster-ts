@@ -9,11 +9,11 @@ export class Player {
     }
     update() {
     }
-    render(canvases) {
+    render(canvases, blockSize) {
         canvases.forEach((canvas) => {
             switch (canvas.id) {
                 case CanvasId.map:
-                    this.renderMap(canvas);
+                    this.renderMap(canvas, blockSize);
                     break;
                 case CanvasId.fov:
                     break;
@@ -21,8 +21,9 @@ export class Player {
             }
         });
     }
-    renderMap(canvas) {
-        const { x, y } = this.position;
+    renderMap(canvas, blockSize) {
+        const x = this.position.x * blockSize;
+        const y = this.position.y * blockSize;
         const context = canvas.getContext('2d');
         const radius = 5;
         context.beginPath();
@@ -38,10 +39,10 @@ export class Player {
         this.turn(2);
     }
     moveForward() {
-        this.move(0.5);
+        this.move(0.01);
     }
     moveBackward() {
-        this.move(-0.5);
+        this.move(-0.01);
     }
     turn(angle) {
         const radians = angle * Math.PI / 180;

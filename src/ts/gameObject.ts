@@ -1,5 +1,3 @@
-import { GameCanvas } from "./gameCanvas";
-
 export enum Status {
     Active,
     Inactive,
@@ -8,7 +6,7 @@ export enum Status {
 export interface GameObject {
     update(): void;
 
-    render(gameCanvases: GameCanvas[]): void;
+    render(gameCanvases: HTMLCanvasElement[], blockSize: number): void;
 
     get status(): Status;
 }

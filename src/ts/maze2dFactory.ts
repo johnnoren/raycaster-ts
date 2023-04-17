@@ -42,7 +42,7 @@ export class Maze2dFactory {
         const cells: Cell[] = [];
         this.initializeCells(cols, rows, cells);
         this.generateMaze(cols, rows, cells);
-        return new Maze2dImpl(cells, cols, Status.Active, tileSize) as Maze2d;
+        return new Maze2dImpl(cells, cols, Status.Active) as Maze2d;
     }
 
     private initializeCells(cols: number, rows: number, cells: Cell[]): void {
@@ -141,26 +141,32 @@ export interface Maze2d extends GameObject{
 
     isBlockType(position: Position, blockType: BlockType): boolean;
 
+    isWall(position: Position): boolean;
+
     get startPosition(): Position;
+
+    get cols(): number;
 }
 
 class Maze2dImpl implements Maze2d {
     private readonly cells: Cell[];
-    private readonly cols: number;
+    public readonly cols: number;
     public status: Status;
-    private readonly tileSize: number;
 
-    constructor(cells: Cell[], cols: number, status: Status, tileSize: number) {
+    constructor(cells: Cell[], cols: number, status: Status) {
         this.cells = cells;
         this.cols = cols;
         this.status = status;
-        this.tileSize = tileSize;
     }
 
     public isBlockType(position: Position, blockType: BlockType): boolean {
-        const normalizedPosition: Position = { x: Math.floor(position.x / this.tileSize), y: Math.floor(position.y / this.tileSize) };
+        const normalizedPosition: Position = { x: Math.floor(position.x), y: Math.floor(position.y) };
         const cell = this.cells.find(cell => cell.position.x === normalizedPosition.x && cell.position.y === normalizedPosition.y);
         return cell!.blockType === blockType;
+    }
+
+    public isWall(position: Position): boolean {
+        return this.isBlockType(position, BlockType.Wall);
     }
 
     public getClosestCell(position: Position, blockType: BlockType): Cell {

@@ -1,12 +1,13 @@
+import { Dda } from "./dda.js";
 import { CanvasId } from "./game.js";
 import { GameObject, Status } from "./gameObject.js";
-import { BlockType, Maze2d } from "./maze2dFactory.js";
+import { BlockType, Maze2d, Position } from "./maze2dFactory.js";
 import { Player, Vector2 } from "./player.js";
 
 export class Ray implements GameObject {
     private distanceToWall: number = 0;
 
-    constructor(private player: Player, public status: Status, private map: Maze2d, private angle: number, private rayNumber: number, private numberOfRays: number, private color: string, private distanceToProjectionPlane: number, private blockSize: number) { }
+    constructor(private player: Player, public status: Status, private map: Maze2d, private angle: number, private rayNumber: number, private numberOfRays: number, private color: string, private distanceToProjectionPlane: number, private blockSize: number, private dda: Dda) { }
 
     update(): void { }
 
@@ -26,13 +27,12 @@ export class Ray implements GameObject {
 
     private renderMap(mapCanvas: HTMLCanvasElement): void {
         const mapCanvasContext = mapCanvas.getContext('2d');
-        const { x: startX, y: startY } = this.player.position;
         const { x: dirX, y: dirY } = this.player.direction;
         const { dirXOffset, dirYOffset } = this.getOffsetAdjustedDirection(dirX, dirY);
-
-        this.distanceToWall = this.getDistanceToWall(startX, startY, dirXOffset, dirYOffset, mapCanvas);
-
-        this.drawRayOnMap(mapCanvasContext!, startX, startY, dirXOffset, dirYOffset, this.distanceToWall);
+    
+        this.distanceToWall = this.getDistanceToWall(dirXOffset, dirYOffset);
+    
+        this.drawRayOnMap(mapCanvasContext!, this.player.position, dirXOffset, dirYOffset, this.distanceToWall);
     }
 
     private renderFov(fovCanvas: HTMLCanvasElement): void {
@@ -55,7 +55,10 @@ export class Ray implements GameObject {
         return { dirXOffset, dirYOffset };
     }
 
-    private drawRayOnMap(context: CanvasRenderingContext2D, startX: number, startY: number, dirX: number, dirY: number, distance: number): void {
+    private drawRayOnMap(context: CanvasRenderingContext2D, playerPosition: Position, dirX: number, dirY: number, distance: number): void {
+        const startX = playerPosition.x * this.blockSize;
+        const startY = playerPosition.y * this.blockSize;
+        distance = distance * this.blockSize;
         context!.beginPath();
         context!.moveTo(startX, startY);
         context!.lineTo(startX + dirX * distance, startY + dirY * distance);
@@ -63,18 +66,18 @@ export class Ray implements GameObject {
         context!.stroke();
     }
 
-    private getDistanceToWall(startX: number, startY: number, dirX: number, dirY: number, canvas: HTMLCanvasElement): number {
-        let distance = 0;
-        let hitWall = false;
-        while (!hitWall && distance < canvas.width) {
-            const x = startX + dirX * distance;
-            const y = startY + dirY * distance;
-            if (this.map.isBlockType({ x, y }, BlockType.Wall)) {
-                hitWall = true;
-            } else {
-                distance += 0.1;
-            }
-        }
+    private getDistanceToWall(dirX: number, dirY: number): number {
+        const { x: startX, y: startY } = this.player.position;
+        const startPosition: Vector2 = { x: startX, y: startY };
+        const direction: Vector2 = { x: dirX, y: dirY };
+    
+        const distance = this.dda.getDistanceToCellType(
+            startPosition,
+            direction,
+            (position: Vector2) => this.map.isBlockType(position, BlockType.Wall),
+            this.map.cols
+        );
+    
         return distance;
     }
 }

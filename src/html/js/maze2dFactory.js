@@ -32,7 +32,7 @@ export class Maze2dFactory {
         const cells = [];
         this.initializeCells(cols, rows, cells);
         this.generateMaze(cols, rows, cells);
-        return new Maze2dImpl(cells, cols, Status.Active, tileSize);
+        return new Maze2dImpl(cells, cols, Status.Active);
     }
     initializeCells(cols, rows, cells) {
         let counter = 0;
@@ -112,16 +112,18 @@ export class Maze2dFactory {
     }
 }
 class Maze2dImpl {
-    constructor(cells, cols, status, tileSize) {
+    constructor(cells, cols, status) {
         this.cells = cells;
         this.cols = cols;
         this.status = status;
-        this.tileSize = tileSize;
     }
     isBlockType(position, blockType) {
-        const normalizedPosition = { x: Math.floor(position.x / this.tileSize), y: Math.floor(position.y / this.tileSize) };
+        const normalizedPosition = { x: Math.floor(position.x), y: Math.floor(position.y) };
         const cell = this.cells.find(cell => cell.position.x === normalizedPosition.x && cell.position.y === normalizedPosition.y);
         return cell.blockType === blockType;
+    }
+    isWall(position) {
+        return this.isBlockType(position, BlockType.Wall);
     }
     getClosestCell(position, blockType) {
         const cells = this.cells.filter(cell => cell.blockType === blockType);

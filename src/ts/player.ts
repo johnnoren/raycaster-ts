@@ -12,11 +12,11 @@ export class Player implements GameObject {
     public update(): void {
     }
 
-    render(canvases: HTMLCanvasElement[]): void {
+    render(canvases: HTMLCanvasElement[], blockSize: number): void {
         canvases.forEach((canvas) => {
             switch (canvas.id) {
                 case CanvasId.map:
-                    this.renderMap(canvas);
+                    this.renderMap(canvas, blockSize);
                     break;
                 case CanvasId.fov:
                     
@@ -26,8 +26,9 @@ export class Player implements GameObject {
         });
     }
 
-    private renderMap(canvas: HTMLCanvasElement): void {
-        const { x, y } = this.position;
+    private renderMap(canvas: HTMLCanvasElement, blockSize: number): void {
+        const x = this.position.x * blockSize;
+        const y = this.position.y * blockSize;
         const context = canvas.getContext('2d');
         const radius = 5;
 
@@ -47,11 +48,11 @@ export class Player implements GameObject {
     }
 
     public moveForward(): void {
-        this.move(0.5);
+        this.move(0.01);
     }
 
     public moveBackward(): void {
-        this.move(-0.5);
+        this.move(-0.01);
     }
 
     public turn(angle: number): void {

@@ -12,9 +12,9 @@ export class GameObjectManager {
         this.deleteInactiveGameObjects();
     }
 
-    public render(canvases: HTMLCanvasElement[]): void {
+    public render(canvases: HTMLCanvasElement[], blockSize: number): void {
         this.clearCanvases(canvases);
-        this.gameObjects.forEach(gameObject => gameObject.render(canvases));
+        this.gameObjects.forEach(gameObject => gameObject.render(canvases, blockSize));
     }
 
     private deleteInactiveGameObjects(): void {

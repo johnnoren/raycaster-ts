@@ -1,7 +1,7 @@
 import { CanvasId } from "./game.js";
 import { BlockType } from "./maze2dFactory.js";
 export class Ray {
-    constructor(player, status, map, angle, rayNumber, numberOfRays, color, distanceToProjectionPlane, blockSize) {
+    constructor(player, status, map, angle, rayNumber, numberOfRays, color, distanceToProjectionPlane, blockSize, dda) {
         this.player = player;
         this.status = status;
         this.map = map;
@@ -11,6 +11,7 @@ export class Ray {
         this.color = color;
         this.distanceToProjectionPlane = distanceToProjectionPlane;
         this.blockSize = blockSize;
+        this.dda = dda;
         this.distanceToWall = 0;
     }
     update() { }
@@ -29,11 +30,10 @@ export class Ray {
     }
     renderMap(mapCanvas) {
         const mapCanvasContext = mapCanvas.getContext('2d');
-        const { x: startX, y: startY } = this.player.position;
         const { x: dirX, y: dirY } = this.player.direction;
         const { dirXOffset, dirYOffset } = this.getOffsetAdjustedDirection(dirX, dirY);
-        this.distanceToWall = this.getDistanceToWall(startX, startY, dirXOffset, dirYOffset, mapCanvas);
-        this.drawRayOnMap(mapCanvasContext, startX, startY, dirXOffset, dirYOffset, this.distanceToWall);
+        this.distanceToWall = this.getDistanceToWall(dirXOffset, dirYOffset);
+        this.drawRayOnMap(mapCanvasContext, this.player.position, dirXOffset, dirYOffset, this.distanceToWall);
     }
     renderFov(fovCanvas) {
         const fovCanvasContext = fovCanvas.getContext('2d');
@@ -51,26 +51,21 @@ export class Ray {
         const dirYOffset = dirX * sin + dirY * cos;
         return { dirXOffset, dirYOffset };
     }
-    drawRayOnMap(context, startX, startY, dirX, dirY, distance) {
+    drawRayOnMap(context, playerPosition, dirX, dirY, distance) {
+        const startX = playerPosition.x * this.blockSize;
+        const startY = playerPosition.y * this.blockSize;
+        distance = distance * this.blockSize;
         context.beginPath();
         context.moveTo(startX, startY);
         context.lineTo(startX + dirX * distance, startY + dirY * distance);
         context.strokeStyle = this.color;
         context.stroke();
     }
-    getDistanceToWall(startX, startY, dirX, dirY, canvas) {
-        let distance = 0;
-        let hitWall = false;
-        while (!hitWall && distance < canvas.width) {
-            const x = startX + dirX * distance;
-            const y = startY + dirY * distance;
-            if (this.map.isBlockType({ x, y }, BlockType.Wall)) {
-                hitWall = true;
-            }
-            else {
-                distance += 0.1;
-            }
-        }
+    getDistanceToWall(dirX, dirY) {
+        const { x: startX, y: startY } = this.player.position;
+        const startPosition = { x: startX, y: startY };
+        const direction = { x: dirX, y: dirY };
+        const distance = this.dda.getDistanceToCellType(startPosition, direction, (position) => this.map.isBlockType(position, BlockType.Wall), this.map.cols);
         return distance;
     }
 }

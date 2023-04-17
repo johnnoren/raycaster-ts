@@ -10,9 +10,9 @@ export class GameObjectManager {
         this.gameObjects.forEach(gameObject => gameObject.update());
         this.deleteInactiveGameObjects();
     }
-    render(canvases) {
+    render(canvases, blockSize) {
         this.clearCanvases(canvases);
-        this.gameObjects.forEach(gameObject => gameObject.render(canvases));
+        this.gameObjects.forEach(gameObject => gameObject.render(canvases, blockSize));
     }
     deleteInactiveGameObjects() {
         this.gameObjects = this.gameObjects.filter(gameObject => gameObject.status === Status.Active);

@@ -1,3 +1,4 @@
+import { Dda } from "./dda.js";
 import { GameLoop } from "./gameLoop.js";
 import { GameObject, Status } from "./gameObject.js";
 import { GameObjectManager } from "./gameObjectManager.js";
@@ -22,6 +23,9 @@ export class Game {
     private canvases: HTMLCanvasElement[] = [];
     private fovCanvas: HTMLCanvasElement;
     private infoManager: InfoManager;
+    private mapCols: number;
+    private mapRows: number;
+    private blockSize: number;
 
     constructor() {
 
@@ -34,18 +38,18 @@ export class Game {
         mapDiv.classList.add('d-flex', 'align-items-center', 'justify-content-center', 'h-100');
         mapDiv.appendChild(this.mapCanvas);
 
-        const mapCols = 21;
-        const mapRows = 21;
-        const tileSize = this.mapCanvas.width / mapCols;
+        this.mapCols = 21;
+        this.mapRows = 21;
+        this.blockSize = this.mapCanvas.width / this.mapCols;
 
-        const map = new Maze2dFactory().createMaze(mapCols, mapRows, tileSize);
+        const map = new Maze2dFactory().createMaze(this.mapCols, this.mapRows, this.blockSize);
         this.gameObjects.push(map);
         this.canvases.push(this.mapCanvas);
 
 
         // ---- PLAYER ----
-        const playerStartingCell: Cell = map.getClosestCell({ x: Math.floor(mapCols / 2), y: Math.floor(mapRows / 2) }, BlockType.Path);
-        const playerStartingPosition: Position = { x: playerStartingCell.position.x * tileSize + (tileSize / 2), y: playerStartingCell.position.y * tileSize + (tileSize / 2) };
+        const playerStartingCell: Cell = map.getClosestCell({ x: Math.floor(this.mapCols / 2), y: Math.floor(this.mapRows / 2) }, BlockType.Path);
+        const playerStartingPosition: Position = { x: playerStartingCell.position.x + 0.5, y: playerStartingCell.position.y + 0.5 };
         this.player = new Player(playerStartingPosition, { x: 0, y: 1 }, Status.Active, map);
         this.gameObjects.push(this.player);
 
@@ -69,11 +73,12 @@ export class Game {
         const distanceToProjectionPlane = (canvasWidth / 2) / Math.tan(playerFov / 2);
         const rayOffset = playerFov / (numberOfRays - 1);
         const centralRayIndex = Math.floor(numberOfRays / 2);
+        const dda = new Dda();
         for (let i = 0; i < numberOfRays; i += 1) {
             const offset = -playerFov / 2 + i * rayOffset;
             const color = (i === centralRayIndex) ? "red" : "yellow";
-            const blockSize = 32;
-            const ray = new Ray(this.player, Status.Active, map, offset, i, numberOfRays, color, distanceToProjectionPlane, blockSize);
+            const blockSize = this.mapCanvas.width / this.mapCols;
+            const ray = new Ray(this.player, Status.Active, map, offset, i, numberOfRays, color, distanceToProjectionPlane, blockSize, dda);
 
             this.gameObjects.push(ray);
         }        
@@ -110,7 +115,7 @@ export class Game {
     }
 
     public render(): void {
-        this.gameObjectsManager.render(this.canvases);
+        this.gameObjectsManager.render(this.canvases, this.mapCanvas.width / this.mapCols);
     }
 
     public start(): void {
