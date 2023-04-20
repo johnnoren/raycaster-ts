@@ -42,7 +42,7 @@ export class Maze2dFactory {
         const cells: Cell[] = [];
         this.initializeCells(cols, rows, cells);
         this.generateMaze(cols, rows, cells);
-        return new Maze2dImpl(cells, cols, Status.Active) as Maze2d;
+        return new Maze2dImpl(cells, cols, rows, Status.Active) as Maze2d;
     }
 
     private initializeCells(cols: number, rows: number, cells: Cell[]): void {
@@ -146,14 +146,17 @@ export interface Maze2d extends GameObject{
     get startPosition(): Position;
 
     get cols(): number;
+
+    get rows(): number;
 }
 
 class Maze2dImpl implements Maze2d {
     private readonly cells: Cell[];
     public readonly cols: number;
+    public readonly rows: number;
     public status: Status;
 
-    constructor(cells: Cell[], cols: number, status: Status) {
+    constructor(cells: Cell[], cols: number, rows: number, status: Status) {
         this.cells = cells;
         this.cols = cols;
         this.status = status;

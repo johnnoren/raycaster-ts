@@ -12,27 +12,26 @@ export class Dda {
      * @param direction - The direction vector.
      * @returns An object containing the initial step lengths for x and y axes.
      */
-    private getInitialStepLength(startPosition: Position, direction: Vector2) {
+    public getInitialStepLength(startPosition: Position, direction: Vector2) {
         return {
             dx: (direction.x > 0) ? 1 - (startPosition.x - Math.floor(startPosition.x)) : startPosition.x - Math.floor(startPosition.x),
             dy: (direction.y > 0) ? 1 - (startPosition.y - Math.floor(startPosition.y)) : startPosition.y - Math.floor(startPosition.y)
         };
     }
     
-
     /**
      * Gets the scaling factors for x and y axes, based on the direction vector.
      * @param direction - The direction vector.
      * @returns An object containing the scaling factors for x and y axes.
      */
-    private getScalingFactors(direction: Vector2) {
+    public getScalingFactors(direction: Vector2) {
         return {
-            sx: 1 + (Math.abs(direction.y) / Math.abs(direction.x)),
-            sy: 1 + (Math.abs(direction.x) / Math.abs(direction.y))
+            sx: (direction.x !== 0) ? 1 / Math.abs(direction.x) : 0,
+            sy: (direction.y !== 0) ? 1 / Math.abs(direction.y) : 0
         };
     }
     
-
+    
     /**
      * Gets the position of the next cell to check, based on the current cell position, line lengths and direction vector.
      * @param currentCellPosition - The current cell position in the grid.
@@ -41,7 +40,7 @@ export class Dda {
      * @param direction - The direction vector.
      * @returns The position of the next cell to check.
      */
-    private getNextCellPosition(currentCellPosition: Position, xLineLength: number, yLineLength: number, direction: Vector2): Position {
+    public getNextCellPosition(currentCellPosition: Position, xLineLength: number, yLineLength: number, direction: Vector2): Position {
         const { x, y } = currentCellPosition;
         const dx = direction.x > 0 ? 1 : -1;
         const dy = direction.y > 0 ? 1 : -1;
@@ -56,32 +55,35 @@ export class Dda {
     * @param isWantedCellType - A predicate function that takes a position and returns true if the cell at that position is the desired cell type.
     * @returns The distance to the nearest cell of the given type, based on a grid cell size of 1 (needs to be multiplied by actual cell size in pixels).
     */
-    public getDistanceToCellType(startPosition: Position, direction: Vector2, isWantedCellType: (position: Position) => boolean, maxLength: number): number {
+    public getDistanceToCellType(startPosition: Position, direction: Vector2, isWantedCellType: (position: Position) => boolean, cols: number, rows: number): number {
         const { dx, dy } = this.getInitialStepLength(startPosition, direction);
         const { sx, sy } = this.getScalingFactors(direction);
     
-        let isWallFound = false;
+        let isWantedCellTypeFound = false;
         let distanceToWall = 0;
         let xLineLength = dx * sx;
         let yLineLength = dy * sy;
         let currentCellPosition = { x: Math.floor(startPosition.x), y: Math.floor(startPosition.y) }
         let totalDistanceTraveled = 0;
+        const distanceToEdge = (dx + cols - Math.abs(startPosition.x)) * sx;
     
-        while (!isWallFound && totalDistanceTraveled < maxLength) {
+        while (!isWantedCellTypeFound && totalDistanceTraveled < distanceToEdge) {
             const nextCellPosition = this.getNextCellPosition(currentCellPosition, xLineLength, yLineLength, direction);
             if (isWantedCellType(nextCellPosition)) {
-                isWallFound = true;
-                distanceToWall = (xLineLength < yLineLength) ? xLineLength : yLineLength;
+                isWantedCellTypeFound = true;
+                distanceToWall = Math.min(xLineLength, yLineLength);
             } else {
                 currentCellPosition = nextCellPosition;
-                const distanceTraveled = (xLineLength < yLineLength) ? sx : sy;
-                totalDistanceTraveled += distanceTraveled;
-                xLineLength += sx;
-                yLineLength += sy;
+                totalDistanceTraveled += (xLineLength < yLineLength) ? sx : sy;
+                if (xLineLength < yLineLength) {
+                    xLineLength += sx;
+                } else {
+                    yLineLength += sy;
+                }
             }
         }
-    
-        return distanceToWall;
+
+        return (isWantedCellTypeFound) ? distanceToWall : distanceToEdge;
     }
     
 

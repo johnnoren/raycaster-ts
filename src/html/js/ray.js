@@ -30,10 +30,9 @@ export class Ray {
     }
     renderMap(mapCanvas) {
         const mapCanvasContext = mapCanvas.getContext('2d');
-        const { x: dirX, y: dirY } = this.player.direction;
-        const { dirXOffset, dirYOffset } = this.getOffsetAdjustedDirection(dirX, dirY);
-        this.distanceToWall = this.getDistanceToWall(dirXOffset, dirYOffset);
-        this.drawRayOnMap(mapCanvasContext, this.player.position, dirXOffset, dirYOffset, this.distanceToWall);
+        const direction = this.getOffsetAdjustedDirection(this.player.direction);
+        this.distanceToWall = this.getDistanceToWall(direction, mapCanvasContext);
+        this.drawRayOnMap(mapCanvasContext, this.player.position, direction, this.distanceToWall);
     }
     renderFov(fovCanvas) {
         const fovCanvasContext = fovCanvas.getContext('2d');
@@ -44,28 +43,40 @@ export class Ray {
         fovCanvasContext.fillStyle = "rgba(255, 0, 0, 0.5)";
         fovCanvasContext.fillRect(wallColumnX, fovCanvas.height / 2 - wallHeight / 2, wallColumnWidth, wallHeight);
     }
-    getOffsetAdjustedDirection(dirX, dirY) {
+    getOffsetAdjustedDirection(direction) {
+        const { x: dirX, y: dirY } = direction;
         const cos = Math.cos(this.angle);
         const sin = Math.sin(this.angle);
         const dirXOffset = dirX * cos - dirY * sin;
         const dirYOffset = dirX * sin + dirY * cos;
-        return { dirXOffset, dirYOffset };
+        return { x: dirXOffset, y: dirYOffset };
     }
-    drawRayOnMap(context, playerPosition, dirX, dirY, distance) {
+    drawRayOnMap(context, playerPosition, direction, distance) {
         const startX = playerPosition.x * this.blockSize;
         const startY = playerPosition.y * this.blockSize;
-        distance = distance * this.blockSize;
+        const endX = (playerPosition.x + (direction.x * distance)) * this.blockSize;
+        const endY = (playerPosition.y + (direction.y * distance)) * this.blockSize;
         context.beginPath();
         context.moveTo(startX, startY);
-        context.lineTo(startX + dirX * distance, startY + dirY * distance);
+        context.lineTo(endX, endY);
         context.strokeStyle = this.color;
         context.stroke();
     }
-    getDistanceToWall(dirX, dirY) {
-        const { x: startX, y: startY } = this.player.position;
-        const startPosition = { x: startX, y: startY };
-        const direction = { x: dirX, y: dirY };
-        const distance = this.dda.getDistanceToCellType(startPosition, direction, (position) => this.map.isBlockType(position, BlockType.Wall), this.map.cols);
+    getDistanceToWall(direction, mapCanvasContext) {
+        const isWall = (position) => {
+            const result = this.map.isBlockType(position, BlockType.Wall);
+            if (result) {
+                this.drawDebugWallBlock(mapCanvasContext, position);
+            }
+            return result;
+        };
+        const distance = this.dda.getDistanceToCellType(this.player.position, direction, isWall, this.map.cols, this.map.rows);
         return distance;
+    }
+    drawDebugWallBlock(context, position) {
+        const x = position.x * this.blockSize;
+        const y = position.y * this.blockSize;
+        context.fillStyle = "rgba(0, 255, 0, 0.5)";
+        context.fillRect(x, y, this.blockSize, this.blockSize);
     }
 }

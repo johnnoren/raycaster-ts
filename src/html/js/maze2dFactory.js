@@ -32,7 +32,7 @@ export class Maze2dFactory {
         const cells = [];
         this.initializeCells(cols, rows, cells);
         this.generateMaze(cols, rows, cells);
-        return new Maze2dImpl(cells, cols, Status.Active);
+        return new Maze2dImpl(cells, cols, rows, Status.Active);
     }
     initializeCells(cols, rows, cells) {
         let counter = 0;
@@ -112,7 +112,7 @@ export class Maze2dFactory {
     }
 }
 class Maze2dImpl {
-    constructor(cells, cols, status) {
+    constructor(cells, cols, rows, status) {
         this.cells = cells;
         this.cols = cols;
         this.status = status;

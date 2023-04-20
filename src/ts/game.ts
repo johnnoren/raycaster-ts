@@ -50,7 +50,7 @@ export class Game {
         // ---- PLAYER ----
         const playerStartingCell: Cell = map.getClosestCell({ x: Math.floor(this.mapCols / 2), y: Math.floor(this.mapRows / 2) }, BlockType.Path);
         const playerStartingPosition: Position = { x: playerStartingCell.position.x + 0.5, y: playerStartingCell.position.y + 0.5 };
-        this.player = new Player(playerStartingPosition, { x: 0, y: 1 }, Status.Active, map);
+        this.player = new Player(playerStartingPosition, { x: 0, y: -1 }, Status.Active, map);
         this.gameObjects.push(this.player);
 
         // ---- FOV ----
@@ -74,15 +74,19 @@ export class Game {
         const rayOffset = playerFov / (numberOfRays - 1);
         const centralRayIndex = Math.floor(numberOfRays / 2);
         const dda = new Dda();
-        for (let i = 0; i < numberOfRays; i += 1) {
-            const offset = -playerFov / 2 + i * rayOffset;
-            const color = (i === centralRayIndex) ? "red" : "yellow";
-            const blockSize = this.mapCanvas.width / this.mapCols;
-            const ray = new Ray(this.player, Status.Active, map, offset, i, numberOfRays, color, distanceToProjectionPlane, blockSize, dda);
+        const blockSize = this.mapCanvas.width / this.mapCols;
+        // for (let i = 0; i < numberOfRays; i += 1) {
+        //     const offset = -playerFov / 2 + i * rayOffset;
+        //     const color = (i === centralRayIndex) ? "red" : "yellow";
+        //     const ray = new Ray(this.player, Status.Active, map, offset, i, numberOfRays, color, distanceToProjectionPlane, blockSize, dda);
 
-            this.gameObjects.push(ray);
-        }        
-        
+        //     this.gameObjects.push(ray);
+        // }        
+
+        // debug
+        const color = "red";
+        const ray = new Ray(this.player, Status.Active, map, 0, 0, 1, color, distanceToProjectionPlane, blockSize, dda);
+        this.gameObjects.push(ray);
 
         // ---- GAME OBJECT MANAGER ----
         this.gameObjectsManager = new GameObjectManager();

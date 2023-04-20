@@ -53,7 +53,11 @@ export class Player {
             [sinAngle, cosAngle]
         ];
         const newDirection = this.multiplyMatrixAndVector(rotationMatrix, this.direction);
-        this.direction = newDirection;
+        this.direction = this.normalize(newDirection);
+    }
+    normalize(vector) {
+        const length = Math.sqrt(vector.x * vector.x + vector.y * vector.y);
+        return { x: vector.x / length, y: vector.y / length };
     }
     move(distance) {
         const newPosition = {

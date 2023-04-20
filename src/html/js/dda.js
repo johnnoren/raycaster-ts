@@ -7,8 +7,8 @@ export class Dda {
     }
     getScalingFactors(direction) {
         return {
-            sx: 1 + (Math.abs(direction.y) / Math.abs(direction.x)),
-            sy: 1 + (Math.abs(direction.x) / Math.abs(direction.y))
+            sx: (direction.x !== 0) ? 1 / Math.abs(direction.x) : 0,
+            sy: (direction.y !== 0) ? 1 / Math.abs(direction.y) : 0
         };
     }
     getNextCellPosition(currentCellPosition, xLineLength, yLineLength, direction) {
@@ -17,29 +17,33 @@ export class Dda {
         const dy = direction.y > 0 ? 1 : -1;
         return (xLineLength < yLineLength) ? { x: x + dx, y } : { x, y: y + dy };
     }
-    getDistanceToCellType(startPosition, direction, isWantedCellType, maxLength) {
+    getDistanceToCellType(startPosition, direction, isWantedCellType, cols, rows) {
         const { dx, dy } = this.getInitialStepLength(startPosition, direction);
         const { sx, sy } = this.getScalingFactors(direction);
-        let isWallFound = false;
+        let isWantedCellTypeFound = false;
         let distanceToWall = 0;
         let xLineLength = dx * sx;
         let yLineLength = dy * sy;
         let currentCellPosition = { x: Math.floor(startPosition.x), y: Math.floor(startPosition.y) };
         let totalDistanceTraveled = 0;
-        while (!isWallFound && totalDistanceTraveled < maxLength) {
+        const distanceToEdge = (dx + cols - Math.abs(startPosition.x)) * sx;
+        while (!isWantedCellTypeFound && totalDistanceTraveled < distanceToEdge) {
             const nextCellPosition = this.getNextCellPosition(currentCellPosition, xLineLength, yLineLength, direction);
             if (isWantedCellType(nextCellPosition)) {
-                isWallFound = true;
-                distanceToWall = (xLineLength < yLineLength) ? xLineLength : yLineLength;
+                isWantedCellTypeFound = true;
+                distanceToWall = Math.min(xLineLength, yLineLength);
             }
             else {
                 currentCellPosition = nextCellPosition;
-                const distanceTraveled = (xLineLength < yLineLength) ? sx : sy;
-                totalDistanceTraveled += distanceTraveled;
-                xLineLength += sx;
-                yLineLength += sy;
+                totalDistanceTraveled += (xLineLength < yLineLength) ? sx : sy;
+                if (xLineLength < yLineLength) {
+                    xLineLength += sx;
+                }
+                else {
+                    yLineLength += sy;
+                }
             }
         }
-        return distanceToWall;
+        return (isWantedCellTypeFound) ? distanceToWall : distanceToEdge;
     }
 }

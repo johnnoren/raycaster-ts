@@ -64,8 +64,14 @@ export class Player implements GameObject {
             [sinAngle, cosAngle]
         ];
         const newDirection: Vector2 = this.multiplyMatrixAndVector(rotationMatrix, this.direction);
-        this.direction = newDirection;
+        this.direction = this.normalize(newDirection);
     }
+    
+    private normalize(vector: Vector2): Vector2 {
+        const length = Math.sqrt(vector.x * vector.x + vector.y * vector.y);
+        return { x: vector.x / length, y: vector.y / length };
+    }
+    
     
     private move(distance: number): void {
         const newPosition: Position = {

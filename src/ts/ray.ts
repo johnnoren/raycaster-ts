@@ -27,57 +27,65 @@ export class Ray implements GameObject {
 
     private renderMap(mapCanvas: HTMLCanvasElement): void {
         const mapCanvasContext = mapCanvas.getContext('2d');
-        const { x: dirX, y: dirY } = this.player.direction;
-        const { dirXOffset, dirYOffset } = this.getOffsetAdjustedDirection(dirX, dirY);
+        const direction = this.getOffsetAdjustedDirection(this.player.direction);
     
-        this.distanceToWall = this.getDistanceToWall(dirXOffset, dirYOffset);
+        this.distanceToWall = this.getDistanceToWall(direction, mapCanvasContext!);
     
-        this.drawRayOnMap(mapCanvasContext!, this.player.position, dirXOffset, dirYOffset, this.distanceToWall);
+        this.drawRayOnMap(mapCanvasContext!, this.player.position, direction, this.distanceToWall);
     }
-
+    
     private renderFov(fovCanvas: HTMLCanvasElement): void {
         const fovCanvasContext = fovCanvas.getContext('2d');
         const correctedDistanceToWall = this.distanceToWall * Math.cos(this.angle);
         const wallHeight = (this.blockSize / correctedDistanceToWall) * this.distanceToProjectionPlane;
         const wallColumnWidth = fovCanvas.width / this.numberOfRays;
         const wallColumnX = this.rayNumber * wallColumnWidth;
-    
+
         fovCanvasContext!.fillStyle = "rgba(255, 0, 0, 0.5)";
         fovCanvasContext!.fillRect(wallColumnX, fovCanvas.height / 2 - wallHeight / 2, wallColumnWidth, wallHeight);
     }
-        
-    
-    private getOffsetAdjustedDirection(dirX: number, dirY: number) {
+
+    private getOffsetAdjustedDirection(direction: Vector2): Vector2 {
+        const { x: dirX, y: dirY } = direction;
         const cos = Math.cos(this.angle);
         const sin = Math.sin(this.angle);
         const dirXOffset = dirX * cos - dirY * sin;
         const dirYOffset = dirX * sin + dirY * cos;
-        return { dirXOffset, dirYOffset };
+        return { x: dirXOffset, y: dirYOffset };
     }
 
-    private drawRayOnMap(context: CanvasRenderingContext2D, playerPosition: Position, dirX: number, dirY: number, distance: number): void {
+    private drawRayOnMap(context: CanvasRenderingContext2D, playerPosition: Position, direction: Vector2, distance: number): void {
         const startX = playerPosition.x * this.blockSize;
         const startY = playerPosition.y * this.blockSize;
-        distance = distance * this.blockSize;
-        context!.beginPath();
-        context!.moveTo(startX, startY);
-        context!.lineTo(startX + dirX * distance, startY + dirY * distance);
-        context!.strokeStyle = this.color;
-        context!.stroke();
+        const endX = (playerPosition.x + (direction.x * distance)) * this.blockSize;
+        const endY = (playerPosition.y + (direction.y * distance)) * this.blockSize;
+
+        context.beginPath();
+        context.moveTo(startX, startY);
+        context.lineTo(endX, endY);
+        context.strokeStyle = this.color;
+        context.stroke();
     }
 
-    private getDistanceToWall(dirX: number, dirY: number): number {
-        const { x: startX, y: startY } = this.player.position;
-        const startPosition: Vector2 = { x: startX, y: startY };
-        const direction: Vector2 = { x: dirX, y: dirY };
-    
-        const distance = this.dda.getDistanceToCellType(
-            startPosition,
-            direction,
-            (position: Vector2) => this.map.isBlockType(position, BlockType.Wall),
-            this.map.cols
-        );
-    
+    private getDistanceToWall(direction: Vector2, mapCanvasContext: CanvasRenderingContext2D): number {
+        const isWall = (position: Vector2) => {
+            const result = this.map.isBlockType(position, BlockType.Wall);
+            if (result) {
+                this.drawDebugWallBlock(mapCanvasContext!, position);
+            }
+            return result;
+        };
+
+        const distance = this.dda.getDistanceToCellType(this.player.position, direction, isWall, this.map.cols, this.map.rows);
+
         return distance;
     }
+
+    private drawDebugWallBlock(context: CanvasRenderingContext2D, position: Vector2): void {
+        const x = position.x * this.blockSize;
+        const y = position.y * this.blockSize;
+        context!.fillStyle = "rgba(0, 255, 0, 0.5)";
+        context!.fillRect(x, y, this.blockSize, this.blockSize);
+    }
+
 }
