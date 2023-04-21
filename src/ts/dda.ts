@@ -55,39 +55,28 @@ export class Dda {
     * @param isWantedCellType - A predicate function that takes a position and returns true if the cell at that position is the desired cell type.
     * @returns The distance to the nearest cell of the given type, based on a grid cell size of 1 (needs to be multiplied by actual cell size in pixels).
     */
-    public getDistanceToCellType(startPosition: Position, direction: Vector2, isWantedCellType: (position: Position) => boolean, cols: number, rows: number): { distanceToWantedCell: number, cellPosition: Position } {
-        const { dx, dy } = this.getInitialStepLength(startPosition, direction);
+    public getDistanceToCellType(startPos: Position, direction: Vector2, isWantedCellType: (pos: Position) => boolean, cols: number, rows: number): { distanceToWantedCell: number, cellPosition: Position } {
+        const { dx, dy } = this.getInitialStepLength(startPos, direction);
         const { sx, sy } = this.getScalingFactors(direction);
+        
+        let xLen = dx * sx;
+        let yLen = dy * sy;
+        let lastPos = { x: Math.floor(startPos.x), y: Math.floor(startPos.y) }
+        const isEdgeCell = (pos: Position) => pos.x === 0 || pos.x === cols - 1 || pos.y === 0 || pos.y === rows - 1;
     
-        let isWantedCellTypeFound = false;
-        let distanceToWall = 0;
-        let xLineLength = dx * sx;
-        let yLineLength = dy * sy;
-        let currentCellPosition = { x: Math.floor(startPosition.x), y: Math.floor(startPosition.y) }
-        let totalDistanceTraveled = 0;
-        const isEdgeCell = (position: Position) => position.x === 0 || position.x === cols - 1 || position.y === 0 || position.y === rows - 1;
-
-        let nextCellPosition: Position = { x: 0, y: 0}
-    
-        while (!isWantedCellTypeFound && !isEdgeCell(currentCellPosition)) {
-            nextCellPosition = this.getNextCellPosition(currentCellPosition, xLineLength, yLineLength, direction);
-            if (isWantedCellType(nextCellPosition)) {
-                isWantedCellTypeFound = true;
-                distanceToWall = Math.min(xLineLength, yLineLength);
-            } else {
-                currentCellPosition = nextCellPosition;
-                totalDistanceTraveled += (xLineLength < yLineLength) ? sx : sy;
-                if (xLineLength < yLineLength) {
-                    xLineLength += sx;
-                } else {
-                    yLineLength += sy;
-                }
+        let curPos: Position = this.getNextCellPosition(lastPos, xLen, yLen, direction);
+        
+        while (!isWantedCellType(curPos) && !isEdgeCell(lastPos)) {
+            curPos = this.getNextCellPosition(lastPos, xLen, yLen, direction);
+            if (!isWantedCellType(curPos)) {
+                lastPos = curPos;
+                (xLen < yLen) ? xLen += sx : yLen += sy;
             }
         }
-
-        const distanceToReturn = (isWantedCellTypeFound) ? distanceToWall : totalDistanceTraveled;
-
-        return { distanceToWantedCell: distanceToReturn, cellPosition: nextCellPosition };
-    }    
+    
+        return { distanceToWantedCell: Math.min(xLen, yLen), cellPosition: curPos };
+    }
+     
 
 }
+

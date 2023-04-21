@@ -48,11 +48,11 @@ export class Player implements GameObject {
     }
 
     public moveForward(): void {
-        this.move(0.01);
+        this.move(0.02);
     }
 
     public moveBackward(): void {
-        this.move(-0.01);
+        this.move(-0.02);
     }
 
     public turn(angle: number): void {

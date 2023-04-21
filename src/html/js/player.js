@@ -39,10 +39,10 @@ export class Player {
         this.turn(2);
     }
     moveForward() {
-        this.move(0.01);
+        this.move(0.02);
     }
     moveBackward() {
-        this.move(-0.01);
+        this.move(-0.02);
     }
     turn(angle) {
         const radians = angle * Math.PI / 180;

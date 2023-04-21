@@ -17,35 +17,21 @@ export class Dda {
         const dy = Math.sign(direction.y);
         return (xLineLength < yLineLength) ? { x: x + dx, y } : { x, y: y + dy };
     }
-    getDistanceToCellType(startPosition, direction, isWantedCellType, cols, rows) {
-        const { dx, dy } = this.getInitialStepLength(startPosition, direction);
+    getDistanceToCellType(startPos, direction, isWantedCellType, cols, rows) {
+        const { dx, dy } = this.getInitialStepLength(startPos, direction);
         const { sx, sy } = this.getScalingFactors(direction);
-        let isWantedCellTypeFound = false;
-        let distanceToWall = 0;
-        let xLineLength = dx * sx;
-        let yLineLength = dy * sy;
-        let currentCellPosition = { x: Math.floor(startPosition.x), y: Math.floor(startPosition.y) };
-        let totalDistanceTraveled = 0;
-        const isEdgeCell = (position) => position.x === 0 || position.x === cols - 1 || position.y === 0 || position.y === rows - 1;
-        let nextCellPosition = { x: 0, y: 0 };
-        while (!isWantedCellTypeFound && !isEdgeCell(currentCellPosition)) {
-            nextCellPosition = this.getNextCellPosition(currentCellPosition, xLineLength, yLineLength, direction);
-            if (isWantedCellType(nextCellPosition)) {
-                isWantedCellTypeFound = true;
-                distanceToWall = Math.min(xLineLength, yLineLength);
-            }
-            else {
-                currentCellPosition = nextCellPosition;
-                totalDistanceTraveled += (xLineLength < yLineLength) ? sx : sy;
-                if (xLineLength < yLineLength) {
-                    xLineLength += sx;
-                }
-                else {
-                    yLineLength += sy;
-                }
+        let xLen = dx * sx;
+        let yLen = dy * sy;
+        let lastPos = { x: Math.floor(startPos.x), y: Math.floor(startPos.y) };
+        const isEdgeCell = (pos) => pos.x === 0 || pos.x === cols - 1 || pos.y === 0 || pos.y === rows - 1;
+        let curPos = this.getNextCellPosition(lastPos, xLen, yLen, direction);
+        while (!isWantedCellType(curPos) && !isEdgeCell(lastPos)) {
+            curPos = this.getNextCellPosition(lastPos, xLen, yLen, direction);
+            if (!isWantedCellType(curPos)) {
+                lastPos = curPos;
+                (xLen < yLen) ? xLen += sx : yLen += sy;
             }
         }
-        const distanceToReturn = (isWantedCellTypeFound) ? distanceToWall : totalDistanceTraveled;
-        return { distanceToWantedCell: distanceToReturn, cellPosition: nextCellPosition };
+        return { distanceToWantedCell: Math.min(xLen, yLen), cellPosition: curPos };
     }
 }
