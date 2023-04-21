@@ -33,10 +33,10 @@ export class Player {
         context.closePath();
     }
     turnLeft() {
-        this.turn(-2);
+        this.turn(-3);
     }
     turnRight() {
-        this.turn(2);
+        this.turn(3);
     }
     moveForward() {
         this.move(0.02);

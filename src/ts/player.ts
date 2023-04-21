@@ -40,11 +40,11 @@ export class Player implements GameObject {
     }
 
     public turnLeft(): void {
-        this.turn(-2);
+        this.turn(-3);
     }
 
     public turnRight(): void {
-        this.turn(2);
+        this.turn(3);
     }
 
     public moveForward(): void {

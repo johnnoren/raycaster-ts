@@ -1,4 +1,5 @@
 import { Dda } from "./dda.js";
+import { Floor } from "./floor.js";
 import { GameLoop } from "./gameLoop.js";
 import { GameObject, Status } from "./gameObject.js";
 import { GameObjectManager } from "./gameObjectManager.js";
@@ -7,6 +8,7 @@ import { InputManager } from "./inputManager.js";
 import { BlockType, Maze2dFactory, Cell, Position } from "./maze2dFactory.js";
 import { Player } from "./player.js";
 import { Ray } from "./ray.js";
+import { Roof } from "./roof.js";
 
 export enum CanvasId {
     map = "map",
@@ -65,6 +67,14 @@ export class Game {
         context.fillStyle = 'rgba(0, 0, 0, 0.5)';
         context.fillRect(0, 0, this.fovCanvas.width, this.fovCanvas.height);
         this.canvases.push(this.fovCanvas);
+
+        // ---- ROOF ----
+        const roof = new Roof(Status.Active);
+        this.gameObjects.push(roof);
+
+        // ---- FLOOR ----
+        const floor = new Floor(Status.Active);
+        this.gameObjects.push(floor);
 
         // ---- RAYS ----
         const playerFov = 90 * (Math.PI / 180);

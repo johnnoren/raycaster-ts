@@ -44,7 +44,8 @@ export class Ray {
             const wallHeight = ((this.blockSize * this.distanceToProjectionPlane) / fishEyeCorrectedDistance) * wallHeightScalingFactor;
             const wallColumnWidth = (fovCanvas.width / this.numberOfRays) * scalingFactor;
             const wallColumnX = this.rayNumber * wallColumnWidth;
-            fovCanvasContext.fillStyle = "rgba(255, 0, 0, 0.5)";
+            const wallColor = 100 / fishEyeCorrectedDistance;
+            fovCanvasContext.fillStyle = "rgba(" + wallColor + ", " + wallColor + ", " + wallColor + ", 1)";
             fovCanvasContext.fillRect(wallColumnX, fovCanvas.height / 2 - wallHeight / 2, wallColumnWidth, wallHeight);
         }
     }

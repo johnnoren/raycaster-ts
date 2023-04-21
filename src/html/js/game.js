@@ -1,4 +1,5 @@
 import { Dda } from "./dda.js";
+import { Floor } from "./floor.js";
 import { GameLoop } from "./gameLoop.js";
 import { Status } from "./gameObject.js";
 import { GameObjectManager } from "./gameObjectManager.js";
@@ -7,6 +8,7 @@ import { InputManager } from "./inputManager.js";
 import { BlockType, Maze2dFactory } from "./maze2dFactory.js";
 import { Player } from "./player.js";
 import { Ray } from "./ray.js";
+import { Roof } from "./roof.js";
 export var CanvasId;
 (function (CanvasId) {
     CanvasId["map"] = "map";
@@ -44,11 +46,14 @@ export class Game {
         context.fillStyle = 'rgba(0, 0, 0, 0.5)';
         context.fillRect(0, 0, this.fovCanvas.width, this.fovCanvas.height);
         this.canvases.push(this.fovCanvas);
+        const roof = new Roof(Status.Active);
+        this.gameObjects.push(roof);
+        const floor = new Floor(Status.Active);
+        this.gameObjects.push(floor);
         const playerFov = 90 * (Math.PI / 180);
         const numberOfRays = 1280;
         const canvasWidth = this.fovCanvas.width;
         const distanceToProjectionPlane = (canvasWidth / 2) / Math.tan(playerFov / 2);
-        const rayAngularStep = playerFov / (numberOfRays - 1);
         const centralRayIndex = Math.floor(numberOfRays / 2);
         const dda = new Dda();
         const blockSize = this.mapCanvas.width / this.mapCols;
