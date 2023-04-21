@@ -26,8 +26,8 @@ export class Dda {
      */
     public getScalingFactors(direction: Vector2) {
         return {
-            sx: (direction.x !== 0) ? 1 / Math.abs(direction.x) : 0,
-            sy: (direction.y !== 0) ? 1 / Math.abs(direction.y) : 0
+            sx: (direction.x !== 0) ? 1 / Math.abs(direction.x) : Infinity,
+            sy: (direction.y !== 0) ? 1 / Math.abs(direction.y) : Infinity
         };
     }
     
@@ -42,8 +42,8 @@ export class Dda {
      */
     public getNextCellPosition(currentCellPosition: Position, xLineLength: number, yLineLength: number, direction: Vector2): Position {
         const { x, y } = currentCellPosition;
-        const dx = direction.x > 0 ? 1 : -1;
-        const dy = direction.y > 0 ? 1 : -1;
+        const dx = Math.sign(direction.x);
+        const dy = Math.sign(direction.y);
 
         return (xLineLength < yLineLength) ? { x: x + dx, y } : { x, y: y + dy };
     }
@@ -55,7 +55,7 @@ export class Dda {
     * @param isWantedCellType - A predicate function that takes a position and returns true if the cell at that position is the desired cell type.
     * @returns The distance to the nearest cell of the given type, based on a grid cell size of 1 (needs to be multiplied by actual cell size in pixels).
     */
-    public getDistanceToCellType(startPosition: Position, direction: Vector2, isWantedCellType: (position: Position) => boolean, cols: number, rows: number): number {
+    public getDistanceToCellType(startPosition: Position, direction: Vector2, isWantedCellType: (position: Position) => boolean, cols: number, rows: number): { distanceToWantedCell: number, cellPosition: Position } {
         const { dx, dy } = this.getInitialStepLength(startPosition, direction);
         const { sx, sy } = this.getScalingFactors(direction);
     
@@ -65,10 +65,12 @@ export class Dda {
         let yLineLength = dy * sy;
         let currentCellPosition = { x: Math.floor(startPosition.x), y: Math.floor(startPosition.y) }
         let totalDistanceTraveled = 0;
-        const distanceToEdge = (dx + cols - Math.abs(startPosition.x)) * sx;
+        const isEdgeCell = (position: Position) => position.x === 0 || position.x === cols - 1 || position.y === 0 || position.y === rows - 1;
+
+        let nextCellPosition: Position = { x: 0, y: 0}
     
-        while (!isWantedCellTypeFound && totalDistanceTraveled < distanceToEdge) {
-            const nextCellPosition = this.getNextCellPosition(currentCellPosition, xLineLength, yLineLength, direction);
+        while (!isWantedCellTypeFound && !isEdgeCell(currentCellPosition)) {
+            nextCellPosition = this.getNextCellPosition(currentCellPosition, xLineLength, yLineLength, direction);
             if (isWantedCellType(nextCellPosition)) {
                 isWantedCellTypeFound = true;
                 distanceToWall = Math.min(xLineLength, yLineLength);
@@ -83,8 +85,9 @@ export class Dda {
             }
         }
 
-        return (isWantedCellTypeFound) ? distanceToWall : distanceToEdge;
-    }
-    
+        const distanceToReturn = (isWantedCellTypeFound) ? distanceToWall : totalDistanceTraveled;
+
+        return { distanceToWantedCell: distanceToReturn, cellPosition: nextCellPosition };
+    }    
 
 }

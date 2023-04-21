@@ -7,14 +7,14 @@ export class Dda {
     }
     getScalingFactors(direction) {
         return {
-            sx: (direction.x !== 0) ? 1 / Math.abs(direction.x) : 0,
-            sy: (direction.y !== 0) ? 1 / Math.abs(direction.y) : 0
+            sx: (direction.x !== 0) ? 1 / Math.abs(direction.x) : Infinity,
+            sy: (direction.y !== 0) ? 1 / Math.abs(direction.y) : Infinity
         };
     }
     getNextCellPosition(currentCellPosition, xLineLength, yLineLength, direction) {
         const { x, y } = currentCellPosition;
-        const dx = direction.x > 0 ? 1 : -1;
-        const dy = direction.y > 0 ? 1 : -1;
+        const dx = Math.sign(direction.x);
+        const dy = Math.sign(direction.y);
         return (xLineLength < yLineLength) ? { x: x + dx, y } : { x, y: y + dy };
     }
     getDistanceToCellType(startPosition, direction, isWantedCellType, cols, rows) {
@@ -26,9 +26,10 @@ export class Dda {
         let yLineLength = dy * sy;
         let currentCellPosition = { x: Math.floor(startPosition.x), y: Math.floor(startPosition.y) };
         let totalDistanceTraveled = 0;
-        const distanceToEdge = (dx + cols - Math.abs(startPosition.x)) * sx;
-        while (!isWantedCellTypeFound && totalDistanceTraveled < distanceToEdge) {
-            const nextCellPosition = this.getNextCellPosition(currentCellPosition, xLineLength, yLineLength, direction);
+        const isEdgeCell = (position) => position.x === 0 || position.x === cols - 1 || position.y === 0 || position.y === rows - 1;
+        let nextCellPosition = { x: 0, y: 0 };
+        while (!isWantedCellTypeFound && !isEdgeCell(currentCellPosition)) {
+            nextCellPosition = this.getNextCellPosition(currentCellPosition, xLineLength, yLineLength, direction);
             if (isWantedCellType(nextCellPosition)) {
                 isWantedCellTypeFound = true;
                 distanceToWall = Math.min(xLineLength, yLineLength);
@@ -44,6 +45,7 @@ export class Dda {
                 }
             }
         }
-        return (isWantedCellTypeFound) ? distanceToWall : distanceToEdge;
+        const distanceToReturn = (isWantedCellTypeFound) ? distanceToWall : totalDistanceTraveled;
+        return { distanceToWantedCell: distanceToReturn, cellPosition: nextCellPosition };
     }
 }

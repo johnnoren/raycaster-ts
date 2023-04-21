@@ -31,8 +31,8 @@ export class Game {
 
         // ---- MAP ----
         this.mapCanvas = document.createElement('canvas');
-        this.mapCanvas.width = 500;
-        this.mapCanvas.height = 500;
+        this.mapCanvas.width = 360;
+        this.mapCanvas.height = 360;
         this.mapCanvas.id = CanvasId.map;
         const mapDiv = document.getElementById('map') as HTMLDivElement;
         mapDiv.classList.add('d-flex', 'align-items-center', 'justify-content-center', 'h-100');
@@ -55,8 +55,8 @@ export class Game {
 
         // ---- FOV ----
         this.fovCanvas = document.createElement('canvas');
-        this.fovCanvas.width = 500;
-        this.fovCanvas.height = 500;
+        this.fovCanvas.width = 1280;
+        this.fovCanvas.height = 720;
         this.fovCanvas.id = CanvasId.fov;
         const fovDiv = document.getElementById('fov') as HTMLDivElement;
         fovDiv.classList.add('d-flex', 'align-items-center', 'justify-content-center', 'h-100');
@@ -75,18 +75,18 @@ export class Game {
         const centralRayIndex = Math.floor(numberOfRays / 2);
         const dda = new Dda();
         const blockSize = this.mapCanvas.width / this.mapCols;
-        // for (let i = 0; i < numberOfRays; i += 1) {
-        //     const offset = -playerFov / 2 + i * rayOffset;
-        //     const color = (i === centralRayIndex) ? "red" : "yellow";
-        //     const ray = new Ray(this.player, Status.Active, map, offset, i, numberOfRays, color, distanceToProjectionPlane, blockSize, dda);
+        for (let i = 0; i < numberOfRays; i += 1) {
+            const offset = -playerFov / 2 + i * rayOffset;
+            const color = (i === centralRayIndex) ? "red" : "yellow";
+            const ray = new Ray(this.player, Status.Active, map, offset, i, numberOfRays, color, distanceToProjectionPlane, blockSize, dda);
 
-        //     this.gameObjects.push(ray);
-        // }        
+            this.gameObjects.push(ray);
+        }        
 
         // debug
-        const color = "red";
-        const ray = new Ray(this.player, Status.Active, map, 0, 0, 1, color, distanceToProjectionPlane, blockSize, dda);
-        this.gameObjects.push(ray);
+        //const color = "red";
+        //const ray = new Ray(this.player, Status.Active, map, 0, 0, 1, color, distanceToProjectionPlane, blockSize, dda);
+        //this.gameObjects.push(ray);
 
         // ---- GAME OBJECT MANAGER ----
         this.gameObjectsManager = new GameObjectManager();

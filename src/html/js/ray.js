@@ -13,6 +13,7 @@ export class Ray {
         this.blockSize = blockSize;
         this.dda = dda;
         this.distanceToWall = 0;
+        this.cellPosition = { x: 0, y: 0 };
     }
     update() { }
     render(canvases) {
@@ -36,12 +37,16 @@ export class Ray {
     }
     renderFov(fovCanvas) {
         const fovCanvasContext = fovCanvas.getContext('2d');
-        const correctedDistanceToWall = this.distanceToWall * Math.cos(this.angle);
-        const wallHeight = (this.blockSize / correctedDistanceToWall) * this.distanceToProjectionPlane;
-        const wallColumnWidth = fovCanvas.width / this.numberOfRays;
-        const wallColumnX = this.rayNumber * wallColumnWidth;
-        fovCanvasContext.fillStyle = "rgba(255, 0, 0, 0.5)";
-        fovCanvasContext.fillRect(wallColumnX, fovCanvas.height / 2 - wallHeight / 2, wallColumnWidth, wallHeight);
+        const scalingFactor = 1;
+        const wallHeightScalingFactor = 0.05;
+        if (this.map.isBlockType(this.cellPosition, BlockType.Wall)) {
+            const fishEyeCorrectedDistance = this.distanceToWall * Math.cos(this.angle);
+            const wallHeight = ((this.blockSize * this.distanceToProjectionPlane) / fishEyeCorrectedDistance) * wallHeightScalingFactor;
+            const wallColumnWidth = (fovCanvas.width / this.numberOfRays) * scalingFactor;
+            const wallColumnX = this.rayNumber * wallColumnWidth;
+            fovCanvasContext.fillStyle = "rgba(255, 0, 0, 0.5)";
+            fovCanvasContext.fillRect(wallColumnX, fovCanvas.height / 2 - wallHeight / 2, wallColumnWidth, wallHeight);
+        }
     }
     getOffsetAdjustedDirection(direction) {
         const { x: dirX, y: dirY } = direction;
@@ -70,8 +75,10 @@ export class Ray {
             }
             return result;
         };
-        const distance = this.dda.getDistanceToCellType(this.player.position, direction, isWall, this.map.cols, this.map.rows);
-        return distance;
+        const distanceAndCellPosition = this.dda.getDistanceToCellType(this.player.position, direction, isWall, this.map.cols, this.map.rows);
+        this.distanceToWall = distanceAndCellPosition.distanceToWantedCell;
+        this.cellPosition = distanceAndCellPosition.cellPosition;
+        return this.distanceToWall;
     }
     drawDebugWallBlock(context, position) {
         const x = position.x * this.blockSize;
