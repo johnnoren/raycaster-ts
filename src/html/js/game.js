@@ -45,7 +45,7 @@ export class Game {
         context.fillRect(0, 0, this.fovCanvas.width, this.fovCanvas.height);
         this.canvases.push(this.fovCanvas);
         const playerFov = 90 * (Math.PI / 180);
-        const numberOfRays = 240;
+        const numberOfRays = 1280;
         const canvasWidth = this.fovCanvas.width;
         const distanceToProjectionPlane = (canvasWidth / 2) / Math.tan(playerFov / 2);
         const rayOffset = playerFov / (numberOfRays - 1);
