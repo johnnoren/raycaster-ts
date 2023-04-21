@@ -38,7 +38,7 @@ export class Ray implements GameObject {
     private renderFov(fovCanvas: HTMLCanvasElement): void {
         const fovCanvasContext = fovCanvas.getContext('2d');
         const scalingFactor = 1; // Adjust this value to increase or decrease the wall width
-        const wallHeightScalingFactor = 0.05; // Adjust this value to increase or decrease the wall height
+        const wallHeightScalingFactor = 0.10; // Adjust this value to increase or decrease the wall height
     
         if (this.map.isBlockType(this.cellPosition, BlockType.Wall)) {
             const fishEyeCorrectedDistance = this.distanceToWall * Math.cos(this.relativeAngle);
@@ -48,8 +48,8 @@ export class Ray implements GameObject {
 
             let wallColor = 100 / fishEyeCorrectedDistance;
     
-            if (wallColor > 150) {
-                wallColor = 150;
+            if (wallColor > 100) {
+                wallColor = 100;
             }
 
             fovCanvasContext!.fillStyle = "rgba(" + wallColor + ", " + wallColor + ", " + wallColor + ", 1)";
@@ -83,9 +83,9 @@ export class Ray implements GameObject {
     private getDistanceToWall(direction: Vector2, mapCanvasContext: CanvasRenderingContext2D): number {
         const isWall = (position: Vector2) => {
             const result = this.map.isBlockType(position, BlockType.Wall);
-            if (result) {
-                this.drawDebugWallBlock(mapCanvasContext!, position);
-            }
+            // if (result) {
+            //     this.drawDebugWallBlock(mapCanvasContext!, position);
+            // }
             return result;
         };
 

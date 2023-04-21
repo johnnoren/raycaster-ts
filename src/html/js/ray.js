@@ -38,15 +38,15 @@ export class Ray {
     renderFov(fovCanvas) {
         const fovCanvasContext = fovCanvas.getContext('2d');
         const scalingFactor = 1;
-        const wallHeightScalingFactor = 0.05;
+        const wallHeightScalingFactor = 0.10;
         if (this.map.isBlockType(this.cellPosition, BlockType.Wall)) {
             const fishEyeCorrectedDistance = this.distanceToWall * Math.cos(this.relativeAngle);
             const wallHeight = ((this.blockSize * this.distanceToProjectionPlane) / fishEyeCorrectedDistance) * wallHeightScalingFactor;
             const wallColumnWidth = (fovCanvas.width / this.numberOfRays) * scalingFactor;
             const wallColumnX = this.rayNumber * wallColumnWidth;
             let wallColor = 100 / fishEyeCorrectedDistance;
-            if (wallColor > 150) {
-                wallColor = 150;
+            if (wallColor > 100) {
+                wallColor = 100;
             }
             fovCanvasContext.fillStyle = "rgba(" + wallColor + ", " + wallColor + ", " + wallColor + ", 1)";
             fovCanvasContext.fillRect(wallColumnX, fovCanvas.height / 2 - wallHeight / 2, wallColumnWidth, wallHeight);
@@ -74,9 +74,6 @@ export class Ray {
     getDistanceToWall(direction, mapCanvasContext) {
         const isWall = (position) => {
             const result = this.map.isBlockType(position, BlockType.Wall);
-            if (result) {
-                this.drawDebugWallBlock(mapCanvasContext, position);
-            }
             return result;
         };
         const distanceAndCellPosition = this.dda.getDistanceToCellType(this.player.position, direction, isWall, this.map.cols, this.map.rows);

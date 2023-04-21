@@ -161,17 +161,15 @@ class Maze2dImpl {
             switch (cell.blockType) {
                 case BlockType.Wall:
                     context.fillStyle = 'black';
+                    context.fillRect(cell.position.x * tileSize, cell.position.y * tileSize, tileSize, tileSize);
                     break;
                 case BlockType.Path:
-                    context.fillStyle = 'white';
                     break;
                 case BlockType.Start:
-                    context.fillStyle = 'green';
                     break;
                 default:
                     throw new Error(`BlockType in cell not implemented: ${cell.blockType}`);
             }
-            context.fillRect(cell.position.x * tileSize, cell.position.y * tileSize, tileSize, tileSize);
         });
     }
     get startPosition() {

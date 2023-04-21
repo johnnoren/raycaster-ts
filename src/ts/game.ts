@@ -31,14 +31,32 @@ export class Game {
 
     constructor() {
 
+        // ---- CANVAS CONTAINER ----
+        const canvasContainer = document.getElementById('canvas-container') as HTMLDivElement;
+
+        // ---- FOV ----
+        this.fovCanvas = document.createElement('canvas');
+        this.fovCanvas.width = 1280;
+        this.fovCanvas.height = 720;
+        this.fovCanvas.id = CanvasId.fov;
+        //const fovDiv = document.getElementById('fov') as HTMLDivElement;
+        //fovDiv.classList.add('d-flex', 'align-items-center', 'justify-content-center', 'h-100');
+        //fovDiv.appendChild(this.fovCanvas);
+        canvasContainer.appendChild(this.fovCanvas);
+        const context = this.fovCanvas.getContext('2d')!;
+        context.fillStyle = 'rgba(0, 0, 0, 0.5)';
+        context.fillRect(0, 0, this.fovCanvas.width, this.fovCanvas.height);
+        this.canvases.push(this.fovCanvas);
+
         // ---- MAP ----
         this.mapCanvas = document.createElement('canvas');
-        this.mapCanvas.width = 360;
-        this.mapCanvas.height = 360;
+        this.mapCanvas.width = 180;
+        this.mapCanvas.height = 180;
         this.mapCanvas.id = CanvasId.map;
-        const mapDiv = document.getElementById('map') as HTMLDivElement;
-        mapDiv.classList.add('d-flex', 'align-items-center', 'justify-content-center', 'h-100');
-        mapDiv.appendChild(this.mapCanvas);
+        //const mapDiv = document.getElementById('map') as HTMLDivElement;
+        //mapDiv.classList.add('d-flex', 'align-items-center', 'justify-content-center', 'h-100');
+        //mapDiv.appendChild(this.mapCanvas);
+        canvasContainer.appendChild(this.mapCanvas);
 
         this.mapCols = 21;
         this.mapRows = 21;
@@ -54,19 +72,6 @@ export class Game {
         const playerStartingPosition: Position = { x: playerStartingCell.position.x + 0.5, y: playerStartingCell.position.y + 0.5 };
         this.player = new Player(playerStartingPosition, { x: 0, y: -1 }, Status.Active, map);
         this.gameObjects.push(this.player);
-
-        // ---- FOV ----
-        this.fovCanvas = document.createElement('canvas');
-        this.fovCanvas.width = 1280;
-        this.fovCanvas.height = 720;
-        this.fovCanvas.id = CanvasId.fov;
-        const fovDiv = document.getElementById('fov') as HTMLDivElement;
-        fovDiv.classList.add('d-flex', 'align-items-center', 'justify-content-center', 'h-100');
-        fovDiv.appendChild(this.fovCanvas);
-        const context = this.fovCanvas.getContext('2d')!;
-        context.fillStyle = 'rgba(0, 0, 0, 0.5)';
-        context.fillRect(0, 0, this.fovCanvas.width, this.fovCanvas.height);
-        this.canvases.push(this.fovCanvas);
 
         // ---- ROOF ----
         const roof = new Roof(Status.Active);

@@ -22,7 +22,7 @@ export class Floor {
         const width = canvas.width;
         const height = canvas.height;
         const heightToDraw = height / 2;
-        const colorStep = 150 / heightToDraw;
+        const colorStep = 100 / heightToDraw;
         let color = 0;
         const startPositionY = heightToDraw;
         for (let i = 0; i < heightToDraw; i++) {

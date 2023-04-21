@@ -30,11 +30,11 @@ export class Player implements GameObject {
         const x = this.position.x * blockSize;
         const y = this.position.y * blockSize;
         const context = canvas.getContext('2d');
-        const radius = 5;
+        const radius = 3;
 
         context!.beginPath();
         context!.arc(x, y, radius, 0, Math.PI * 2);
-        context!.fillStyle = 'green';
+        context!.fillStyle = 'lime';
         context!.fill();
         context!.closePath();
     }
