@@ -46,8 +46,12 @@ export class Ray implements GameObject {
             const wallColumnWidth = (fovCanvas.width / this.numberOfRays) * scalingFactor;
             const wallColumnX = this.rayNumber * wallColumnWidth;
 
-            const wallColor = 100 / fishEyeCorrectedDistance;
+            let wallColor = 100 / fishEyeCorrectedDistance;
     
+            if (wallColor > 150) {
+                wallColor = 150;
+            }
+
             fovCanvasContext!.fillStyle = "rgba(" + wallColor + ", " + wallColor + ", " + wallColor + ", 1)";
             fovCanvasContext!.fillRect(wallColumnX, fovCanvas.height / 2 - wallHeight / 2, wallColumnWidth, wallHeight);
         }
