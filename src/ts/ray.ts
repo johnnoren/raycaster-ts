@@ -8,7 +8,7 @@ export class Ray implements GameObject {
     private distanceToWall: number = 0;
     private cellPosition: Vector2 = { x: 0, y: 0 };
 
-    constructor(private player: Player, public status: Status, private map: Maze2d, private angle: number, private rayNumber: number, private numberOfRays: number, private color: string, private distanceToProjectionPlane: number, private blockSize: number, private dda: Dda) { }
+    constructor(private player: Player, public status: Status, private map: Maze2d, private relativeAngle: number, private rayNumber: number, private numberOfRays: number, private color: string, private distanceToProjectionPlane: number, private blockSize: number, private dda: Dda) { }
 
     update(): void { }
 
@@ -41,7 +41,7 @@ export class Ray implements GameObject {
         const wallHeightScalingFactor = 0.05; // Adjust this value to increase or decrease the wall height
     
         if (this.map.isBlockType(this.cellPosition, BlockType.Wall)) {
-            const fishEyeCorrectedDistance = this.distanceToWall * Math.cos(this.angle);
+            const fishEyeCorrectedDistance = this.distanceToWall * Math.cos(this.relativeAngle);
             const wallHeight = ((this.blockSize * this.distanceToProjectionPlane) / fishEyeCorrectedDistance) * wallHeightScalingFactor;
             const wallColumnWidth = (fovCanvas.width / this.numberOfRays) * scalingFactor;
             const wallColumnX = this.rayNumber * wallColumnWidth;
@@ -53,12 +53,13 @@ export class Ray implements GameObject {
     
     private getOffsetAdjustedDirection(direction: Vector2): Vector2 {
         const { x: dirX, y: dirY } = direction;
-        const cos = Math.cos(this.angle);
-        const sin = Math.sin(this.angle);
+        const cos = Math.cos(this.relativeAngle);
+        const sin = Math.sin(this.relativeAngle);
         const dirXOffset = dirX * cos - dirY * sin;
         const dirYOffset = dirX * sin + dirY * cos;
         return { x: dirXOffset, y: dirYOffset };
     }
+    
 
     private drawRayOnMap(context: CanvasRenderingContext2D, playerPosition: Position, direction: Vector2, distance: number): void {
         const startX = playerPosition.x * this.blockSize;

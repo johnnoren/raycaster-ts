@@ -71,17 +71,20 @@ export class Game {
         const numberOfRays = 1280;
         const canvasWidth = this.fovCanvas.width;
         const distanceToProjectionPlane = (canvasWidth / 2) / Math.tan(playerFov / 2);
-        const rayOffset = playerFov / (numberOfRays - 1);
         const centralRayIndex = Math.floor(numberOfRays / 2);
         const dda = new Dda();
         const blockSize = this.mapCanvas.width / this.mapCols;
         for (let i = 0; i < numberOfRays; i += 1) {
-            const offset = -playerFov / 2 + i * rayOffset;
+            const rayScreenPosX = i - numberOfRays / 2;
+            const relativeAngle = Math.atan2(rayScreenPosX, distanceToProjectionPlane);
             const color = (i === centralRayIndex) ? "red" : "yellow";
-            const ray = new Ray(this.player, Status.Active, map, offset, i, numberOfRays, color, distanceToProjectionPlane, blockSize, dda);
-
+            const ray = new Ray(this.player, Status.Active, map, relativeAngle, i, numberOfRays, color, distanceToProjectionPlane, blockSize, dda);
+        
             this.gameObjects.push(ray);
-        }        
+        }
+        
+        
+
 
         // debug
         //const color = "red";

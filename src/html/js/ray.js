@@ -1,11 +1,11 @@
 import { CanvasId } from "./game.js";
 import { BlockType } from "./maze2dFactory.js";
 export class Ray {
-    constructor(player, status, map, angle, rayNumber, numberOfRays, color, distanceToProjectionPlane, blockSize, dda) {
+    constructor(player, status, map, relativeAngle, rayNumber, numberOfRays, color, distanceToProjectionPlane, blockSize, dda) {
         this.player = player;
         this.status = status;
         this.map = map;
-        this.angle = angle;
+        this.relativeAngle = relativeAngle;
         this.rayNumber = rayNumber;
         this.numberOfRays = numberOfRays;
         this.color = color;
@@ -40,7 +40,7 @@ export class Ray {
         const scalingFactor = 1;
         const wallHeightScalingFactor = 0.05;
         if (this.map.isBlockType(this.cellPosition, BlockType.Wall)) {
-            const fishEyeCorrectedDistance = this.distanceToWall * Math.cos(this.angle);
+            const fishEyeCorrectedDistance = this.distanceToWall * Math.cos(this.relativeAngle);
             const wallHeight = ((this.blockSize * this.distanceToProjectionPlane) / fishEyeCorrectedDistance) * wallHeightScalingFactor;
             const wallColumnWidth = (fovCanvas.width / this.numberOfRays) * scalingFactor;
             const wallColumnX = this.rayNumber * wallColumnWidth;
@@ -50,8 +50,8 @@ export class Ray {
     }
     getOffsetAdjustedDirection(direction) {
         const { x: dirX, y: dirY } = direction;
-        const cos = Math.cos(this.angle);
-        const sin = Math.sin(this.angle);
+        const cos = Math.cos(this.relativeAngle);
+        const sin = Math.sin(this.relativeAngle);
         const dirXOffset = dirX * cos - dirY * sin;
         const dirYOffset = dirX * sin + dirY * cos;
         return { x: dirXOffset, y: dirYOffset };
