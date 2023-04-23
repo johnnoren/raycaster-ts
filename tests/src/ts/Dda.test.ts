@@ -1,4 +1,4 @@
-import { Dda, Position, Vector2 } from '../../../src/ts/dda';
+import { Dda, Position, Vector2 } from '../../../src/ts/math/dda';
 
 describe('Dda', () => {
   let dda: Dda;
@@ -22,7 +22,7 @@ describe('Dda', () => {
       return position.x === 3 && position.y === 1;
     };
 
-    const result = dda.getDistanceToCellType(startPosition, direction, isWantedCellType, gridWidth, gridHeight);
+    const result = dda.getCellCollisionVector(startPosition, direction, isWantedCellType, gridWidth, gridHeight);
 
     expect(result).toBeCloseTo(1.5);
   });
@@ -42,7 +42,7 @@ describe('Dda', () => {
       return position.x === 1 && position.y === 3;
     };
   
-    const result = dda.getDistanceToCellType(startPosition, direction, isWantedCellType, gridWidth, gridHeight);
+    const result = dda.getCellCollisionVector(startPosition, direction, isWantedCellType, gridWidth, gridHeight);
   
     expect(result).toBeCloseTo(1.5);
   });
@@ -62,7 +62,7 @@ describe('Dda', () => {
       return position.x === 1 && position.y === 0;
     };
   
-    const result = dda.getDistanceToCellType(startPosition, direction, isWantedCellType, gridWidth, gridHeight);
+    const result = dda.getCellCollisionVector(startPosition, direction, isWantedCellType, gridWidth, gridHeight);
   
     expect(result).toBeCloseTo(0.5);
   });
@@ -76,7 +76,7 @@ describe('Dda', () => {
   
     const isWantedCellType = (_position: Position) => false;
   
-    const result = dda.getDistanceToCellType(startPosition, direction, isWantedCellType, gridWidth, gridHeight);
+    const result = dda.getCellCollisionVector(startPosition, direction, isWantedCellType, gridWidth, gridHeight);
   
     expect(result).toBe(1.5);
   });

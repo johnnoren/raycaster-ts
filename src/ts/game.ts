@@ -1,4 +1,4 @@
-import { Dda } from "./dda.js";
+import { Dda } from "./math/dda.js";
 import { Floor } from "./floor.js";
 import { GameLoop } from "./gameLoop.js";
 import { GameObject, Status } from "./gameObject.js";
@@ -9,6 +9,8 @@ import { BlockType, Maze2dFactory, Cell, Position } from "./maze2dFactory.js";
 import { Player } from "./player.js";
 import { Ray } from "./ray.js";
 import { Roof } from "./roof.js";
+import { Vector2 } from "./math/vector2.js";
+import { Direction } from "./math/direction.js";
 
 export enum CanvasId {
     map = "map",
@@ -70,7 +72,7 @@ export class Game {
         // ---- PLAYER ----
         const playerStartingCell: Cell = map.getClosestCell({ x: Math.floor(this.mapCols / 2), y: Math.floor(this.mapRows / 2) }, BlockType.Path);
         const playerStartingPosition: Position = { x: playerStartingCell.position.x + 0.5, y: playerStartingCell.position.y + 0.5 };
-        this.player = new Player(playerStartingPosition, { x: 0, y: -1 }, Status.Active, map);
+        this.player = new Player(playerStartingPosition, new Direction(new Vector2(0,-1)), Status.Active, map);
         this.gameObjects.push(this.player);
 
         // ---- ROOF ----

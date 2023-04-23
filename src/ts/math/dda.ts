@@ -1,46 +1,27 @@
+import { Direction } from "./direction.js";
+import { Vector2 } from "./vector2.js";
 export type Position = { x: number; y: number };
-export type Vector2 = { x: number; y: number };
 
 /**
  * Calculates the shortest distance in a certain direction to a specified cell type in a grid using the digital differential analyzer (DDA) algorithm.
  */
 export class Dda {
 
-    /**
-     * Gets the initial step length for x and y axes, based on the start position and direction.
-     * @param startPosition - The starting position in the grid.
-     * @param direction - The direction vector.
-     * @returns An object containing the initial step lengths for x and y axes.
-     */
-    public getInitialStepLength(startPosition: Position, direction: Vector2) {
+    public getInitialStepLength(startPosition: Position, direction: Direction) {
         return {
             dx: (direction.x > 0) ? 1 - (startPosition.x - Math.floor(startPosition.x)) : startPosition.x - Math.floor(startPosition.x),
             dy: (direction.y > 0) ? 1 - (startPosition.y - Math.floor(startPosition.y)) : startPosition.y - Math.floor(startPosition.y)
         };
     }
     
-    /**
-     * Gets the scaling factors for x and y axes, based on the direction vector.
-     * @param direction - The direction vector.
-     * @returns An object containing the scaling factors for x and y axes.
-     */
-    public getScalingFactors(direction: Vector2) {
+    public getScalingFactors(direction: Direction) {
         return {
             sx: (direction.x !== 0) ? 1 / Math.abs(direction.x) : Infinity,
             sy: (direction.y !== 0) ? 1 / Math.abs(direction.y) : Infinity
         };
     }
     
-    
-    /**
-     * Gets the position of the next cell to check, based on the current cell position, line lengths and direction vector.
-     * @param currentCellPosition - The current cell position in the grid.
-     * @param xLineLength - The length of the line to the next vertical cell boundary.
-     * @param yLineLength - The length of the line to the next horizontal cell boundary.
-     * @param direction - The direction vector.
-     * @returns The position of the next cell to check.
-     */
-    public getNextCellPosition(currentCellPosition: Position, xLineLength: number, yLineLength: number, direction: Vector2): Position {
+    public getNextCellPosition(currentCellPosition: Position, xLineLength: number, yLineLength: number, direction: Direction): Position {
         const { x, y } = currentCellPosition;
         const dx = Math.sign(direction.x);
         const dy = Math.sign(direction.y);
@@ -53,9 +34,9 @@ export class Dda {
     * @param startPosition - The starting position in the grid. Needs to be divided by the actual cell size in pixels before calling this function.
     * @param direction - The direction vector.
     * @param isWantedCellType - A predicate function that takes a position and returns true if the cell at that position is the desired cell type.
-    * @returns The distance to the nearest cell of the given type, based on a grid cell size of 1 (needs to be multiplied by actual cell size in pixels).
+    * @returns The distance to the nearest cell matching the given predicate, based on a grid cell size of 1 (needs to be multiplied by actual cell size in pixels).
     */
-    public getDistanceToCellType(startPos: Position, direction: Vector2, isWantedCellType: (pos: Position) => boolean, cols: number, rows: number): { distanceToWantedCell: number, cellPosition: Position } {
+    public getCellCollisionVector(startPos: Position, direction: Direction, isWantedCellType: (pos: Position) => boolean, cols: number, rows: number): Vector2 {
         const { dx, dy } = this.getInitialStepLength(startPos, direction);
         const { sx, sy } = this.getScalingFactors(direction);
         
@@ -74,7 +55,9 @@ export class Dda {
             }
         }
     
-        return { distanceToWantedCell: Math.min(xLen, yLen), cellPosition: curPos };
+        const magnitude = Math.min(xLen, yLen);
+        return Vector2.from(magnitude, direction);
+
     }
      
 

@@ -1,5 +1,7 @@
 import { CanvasId } from "./game.js";
 import { BlockType } from "./maze2dFactory.js";
+import { Vector2 } from "./math/vector2.js";
+import { Direction } from "./math/direction.js";
 export class Ray {
     constructor(player, status, map, relativeAngle, rayNumber, numberOfRays, color, distanceToProjectionPlane, blockSize, dda) {
         this.player = player;
@@ -12,8 +14,7 @@ export class Ray {
         this.distanceToProjectionPlane = distanceToProjectionPlane;
         this.blockSize = blockSize;
         this.dda = dda;
-        this.distanceToWall = 0;
-        this.cellPosition = { x: 0, y: 0 };
+        this.wallCellCollisionVector = new Vector2(0, 0);
     }
     update() { }
     render(canvases) {
@@ -32,25 +33,23 @@ export class Ray {
     renderMap(mapCanvas) {
         const mapCanvasContext = mapCanvas.getContext('2d');
         const direction = this.getOffsetAdjustedDirection(this.player.direction);
-        this.distanceToWall = this.getDistanceToWall(direction, mapCanvasContext);
-        this.drawRayOnMap(mapCanvasContext, this.player.position, direction, this.distanceToWall);
+        this.wallCellCollisionVector = this.getWallCellCollisionVector(direction);
+        this.drawRayOnMap(mapCanvasContext, this.player.position, this.wallCellCollisionVector);
     }
     renderFov(fovCanvas) {
         const fovCanvasContext = fovCanvas.getContext('2d');
-        const scalingFactor = 1;
         const wallHeightScalingFactor = 0.10;
-        if (this.map.isBlockType(this.cellPosition, BlockType.Wall)) {
-            const fishEyeCorrectedDistance = this.distanceToWall * Math.cos(this.relativeAngle);
-            const wallHeight = ((this.blockSize * this.distanceToProjectionPlane) / fishEyeCorrectedDistance) * wallHeightScalingFactor;
-            const wallColumnWidth = (fovCanvas.width / this.numberOfRays) * scalingFactor;
-            const wallColumnX = this.rayNumber * wallColumnWidth;
-            let wallColor = 100 / fishEyeCorrectedDistance;
-            if (wallColor > 100) {
-                wallColor = 100;
-            }
-            fovCanvasContext.fillStyle = "rgba(" + wallColor + ", " + wallColor + ", " + wallColor + ", 1)";
-            fovCanvasContext.fillRect(wallColumnX, fovCanvas.height / 2 - wallHeight / 2, wallColumnWidth, wallHeight);
+        const magnitude = this.wallCellCollisionVector.magnitude;
+        const fishEyeCorrectedDistance = magnitude * Math.cos(this.relativeAngle);
+        const wallHeight = ((this.blockSize * this.distanceToProjectionPlane) / fishEyeCorrectedDistance) * wallHeightScalingFactor;
+        const wallColumnWidth = (fovCanvas.width / this.numberOfRays);
+        const wallColumnX = this.rayNumber * wallColumnWidth;
+        let wallColor = 100 / fishEyeCorrectedDistance;
+        if (wallColor > 100) {
+            wallColor = 100;
         }
+        fovCanvasContext.fillStyle = "rgba(" + wallColor + ", " + wallColor + ", " + wallColor + ", 1)";
+        fovCanvasContext.fillRect(wallColumnX, fovCanvas.height / 2 - wallHeight / 2, wallColumnWidth, wallHeight);
     }
     getOffsetAdjustedDirection(direction) {
         const { x: dirX, y: dirY } = direction;
@@ -58,33 +57,25 @@ export class Ray {
         const sin = Math.sin(this.relativeAngle);
         const dirXOffset = dirX * cos - dirY * sin;
         const dirYOffset = dirX * sin + dirY * cos;
-        return { x: dirXOffset, y: dirYOffset };
+        const newVector = new Vector2(dirXOffset, dirYOffset);
+        return new Direction(newVector);
     }
-    drawRayOnMap(context, playerPosition, direction, distance) {
+    drawRayOnMap(context, playerPosition, wallCellCollisionVector) {
         const startX = playerPosition.x * this.blockSize;
         const startY = playerPosition.y * this.blockSize;
-        const endX = (playerPosition.x + (direction.x * distance)) * this.blockSize;
-        const endY = (playerPosition.y + (direction.y * distance)) * this.blockSize;
+        const endX = (playerPosition.x + wallCellCollisionVector.x) * this.blockSize;
+        const endY = (playerPosition.y + wallCellCollisionVector.y) * this.blockSize;
         context.beginPath();
         context.moveTo(startX, startY);
         context.lineTo(endX, endY);
         context.strokeStyle = this.color;
         context.stroke();
     }
-    getDistanceToWall(direction, mapCanvasContext) {
+    getWallCellCollisionVector(direction) {
         const isWall = (position) => {
             const result = this.map.isBlockType(position, BlockType.Wall);
             return result;
         };
-        const distanceAndCellPosition = this.dda.getDistanceToCellType(this.player.position, direction, isWall, this.map.cols, this.map.rows);
-        this.distanceToWall = distanceAndCellPosition.distanceToWantedCell;
-        this.cellPosition = distanceAndCellPosition.cellPosition;
-        return this.distanceToWall;
-    }
-    drawDebugWallBlock(context, position) {
-        const x = position.x * this.blockSize;
-        const y = position.y * this.blockSize;
-        context.fillStyle = "rgba(0, 255, 0, 0.5)";
-        context.fillRect(x, y, this.blockSize, this.blockSize);
+        return this.dda.getCellCollisionVector(this.player.position, direction, isWall, this.map.cols, this.map.rows);
     }
 }

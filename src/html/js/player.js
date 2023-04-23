@@ -1,5 +1,7 @@
 import { CanvasId } from "./game.js";
 import { BlockType } from "./maze2dFactory.js";
+import { Vector2 } from "./math/vector2.js";
+import { Direction } from "./math/direction.js";
 export class Player {
     constructor(position, direction, status, maze) {
         this.position = position;
@@ -52,12 +54,7 @@ export class Player {
             [cosAngle, -sinAngle],
             [sinAngle, cosAngle]
         ];
-        const newDirection = this.multiplyMatrixAndVector(rotationMatrix, this.direction);
-        this.direction = this.normalize(newDirection);
-    }
-    normalize(vector) {
-        const length = Math.sqrt(vector.x * vector.x + vector.y * vector.y);
-        return { x: vector.x / length, y: vector.y / length };
+        this.direction = new Direction(this.multiplyMatrixAndVector(rotationMatrix, this.direction.vector));
     }
     move(distance) {
         const newPosition = {
@@ -71,6 +68,6 @@ export class Player {
     multiplyMatrixAndVector(matrix, vector) {
         const x = matrix[0][0] * vector.x + matrix[0][1] * vector.y;
         const y = matrix[1][0] * vector.x + matrix[1][1] * vector.y;
-        return { x, y };
+        return new Vector2(x, y);
     }
 }

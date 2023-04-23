@@ -1,12 +1,13 @@
-import { Dda } from "./dda.js";
+import { Dda } from "./math/dda.js";
 import { CanvasId } from "./game.js";
 import { GameObject, Status } from "./gameObject.js";
 import { BlockType, Maze2d, Position } from "./maze2dFactory.js";
-import { Player, Vector2 } from "./player.js";
+import { Player } from "./player.js";
+import { Vector2 } from "./math/vector2.js";
+import { Direction } from "./math/direction.js";
 
 export class Ray implements GameObject {
-    private distanceToWall: number = 0;
-    private cellPosition: Vector2 = { x: 0, y: 0 };
+    private wallCellCollisionVector: Vector2 = new Vector2(0, 0);
 
     constructor(private player: Player, public status: Status, private map: Maze2d, private relativeAngle: number, private rayNumber: number, private numberOfRays: number, private color: string, private distanceToProjectionPlane: number, private blockSize: number, private dda: Dda) { }
 
@@ -30,20 +31,18 @@ export class Ray implements GameObject {
         const mapCanvasContext = mapCanvas.getContext('2d');
         const direction = this.getOffsetAdjustedDirection(this.player.direction);
     
-        this.distanceToWall = this.getDistanceToWall(direction, mapCanvasContext!);
+        this.wallCellCollisionVector = this.getWallCellCollisionVector(direction);
     
-        this.drawRayOnMap(mapCanvasContext!, this.player.position, direction, this.distanceToWall);
+        this.drawRayOnMap(mapCanvasContext!, this.player.position, this.wallCellCollisionVector);
     }
     
     private renderFov(fovCanvas: HTMLCanvasElement): void {
         const fovCanvasContext = fovCanvas.getContext('2d');
-        const scalingFactor = 1; // Adjust this value to increase or decrease the wall width
         const wallHeightScalingFactor = 0.10; // Adjust this value to increase or decrease the wall height
-    
-        if (this.map.isBlockType(this.cellPosition, BlockType.Wall)) {
-            const fishEyeCorrectedDistance = this.distanceToWall * Math.cos(this.relativeAngle);
+            const magnitude = this.wallCellCollisionVector.magnitude;
+            const fishEyeCorrectedDistance = magnitude * Math.cos(this.relativeAngle);
             const wallHeight = ((this.blockSize * this.distanceToProjectionPlane) / fishEyeCorrectedDistance) * wallHeightScalingFactor;
-            const wallColumnWidth = (fovCanvas.width / this.numberOfRays) * scalingFactor;
+            const wallColumnWidth = (fovCanvas.width / this.numberOfRays);
             const wallColumnX = this.rayNumber * wallColumnWidth;
 
             let wallColor = 100 / fishEyeCorrectedDistance;
@@ -54,24 +53,25 @@ export class Ray implements GameObject {
 
             fovCanvasContext!.fillStyle = "rgba(" + wallColor + ", " + wallColor + ", " + wallColor + ", 1)";
             fovCanvasContext!.fillRect(wallColumnX, fovCanvas.height / 2 - wallHeight / 2, wallColumnWidth, wallHeight);
-        }
+        
     }
     
-    private getOffsetAdjustedDirection(direction: Vector2): Vector2 {
+    private getOffsetAdjustedDirection(direction: Direction): Direction {
         const { x: dirX, y: dirY } = direction;
         const cos = Math.cos(this.relativeAngle);
         const sin = Math.sin(this.relativeAngle);
         const dirXOffset = dirX * cos - dirY * sin;
         const dirYOffset = dirX * sin + dirY * cos;
-        return { x: dirXOffset, y: dirYOffset };
+        const newVector = new Vector2(dirXOffset, dirYOffset);
+        return new Direction(newVector);
     }
     
 
-    private drawRayOnMap(context: CanvasRenderingContext2D, playerPosition: Position, direction: Vector2, distance: number): void {
+    private drawRayOnMap(context: CanvasRenderingContext2D, playerPosition: Position, wallCellCollisionVector: Vector2): void {
         const startX = playerPosition.x * this.blockSize;
         const startY = playerPosition.y * this.blockSize;
-        const endX = (playerPosition.x + (direction.x * distance)) * this.blockSize;
-        const endY = (playerPosition.y + (direction.y * distance)) * this.blockSize;
+        const endX = (playerPosition.x + wallCellCollisionVector.x) * this.blockSize;
+        const endY = (playerPosition.y + wallCellCollisionVector.y) * this.blockSize;
 
         context.beginPath();
         context.moveTo(startX, startY);
@@ -80,27 +80,15 @@ export class Ray implements GameObject {
         context.stroke();
     }
 
-    private getDistanceToWall(direction: Vector2, mapCanvasContext: CanvasRenderingContext2D): number {
+    private getWallCellCollisionVector(direction: Direction): Vector2 {
         const isWall = (position: Vector2) => {
             const result = this.map.isBlockType(position, BlockType.Wall);
-            // if (result) {
-            //     this.drawDebugWallBlock(mapCanvasContext!, position);
-            // }
+
             return result;
         };
 
-        const distanceAndCellPosition = this.dda.getDistanceToCellType(this.player.position, direction, isWall, this.map.cols, this.map.rows);
-        this.distanceToWall = distanceAndCellPosition.distanceToWantedCell;
-        this.cellPosition = distanceAndCellPosition.cellPosition;
+        return this.dda.getCellCollisionVector(this.player.position, direction, isWall, this.map.cols, this.map.rows);
 
-        return this.distanceToWall;
-    }
-
-    private drawDebugWallBlock(context: CanvasRenderingContext2D, position: Vector2): void {
-        const x = position.x * this.blockSize;
-        const y = position.y * this.blockSize;
-        context!.fillStyle = "rgba(0, 255, 0, 0.5)";
-        context!.fillRect(x, y, this.blockSize, this.blockSize);
     }
 
 }
