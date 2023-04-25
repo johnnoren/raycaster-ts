@@ -5,7 +5,7 @@ export class Floor {
     }
     update() {
     }
-    render(canvases, blockSize) {
+    render(canvases, _blockSize) {
         canvases.forEach((canvas) => {
             switch (canvas.id) {
                 case CanvasId.map:

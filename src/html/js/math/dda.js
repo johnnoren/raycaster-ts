@@ -16,14 +16,14 @@ export class Dda {
         const { x, y } = currentCellPosition;
         const dx = Math.sign(direction.x);
         const dy = Math.sign(direction.y);
-        return (xLineLength < yLineLength) ? { x: x + dx, y } : { x, y: y + dy };
+        return (xLineLength < yLineLength) ? new Vector2(x + dx, y) : new Vector2(x, y + dy);
     }
     getCellCollisionVector(startPos, direction, isWantedCellType, cols, rows) {
         const { dx, dy } = this.getInitialStepLength(startPos, direction);
         const { sx, sy } = this.getScalingFactors(direction);
         let xLen = dx * sx;
         let yLen = dy * sy;
-        let lastPos = { x: Math.floor(startPos.x), y: Math.floor(startPos.y) };
+        let lastPos = new Vector2(Math.floor(startPos.x), Math.floor(startPos.y));
         const isEdgeCell = (pos) => pos.x === 0 || pos.x === cols - 1 || pos.y === 0 || pos.y === rows - 1;
         let curPos = this.getNextCellPosition(lastPos, xLen, yLen, direction);
         while (!isWantedCellType(curPos) && !isEdgeCell(lastPos)) {

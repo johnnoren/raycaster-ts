@@ -1,13 +1,13 @@
 import { CanvasId } from "./game.js";
-import { BlockType } from "./maze2dFactory.js";
 import { Vector2 } from "./math/vector2.js";
 import { Direction } from "./math/direction.js";
+import { BlockType } from "./gameObjects/map2.js";
 export class Player {
-    constructor(position, direction, status, maze) {
+    constructor(position, direction, status, map) {
         this.position = position;
         this.direction = direction;
         this.status = status;
-        this.maze = maze;
+        this.map = map;
     }
     update() {
     }
@@ -57,11 +57,8 @@ export class Player {
         this.direction = new Direction(this.multiplyMatrixAndVector(rotationMatrix, this.direction.vector));
     }
     move(distance) {
-        const newPosition = {
-            x: this.position.x + distance * this.direction.x,
-            y: this.position.y + distance * this.direction.y
-        };
-        if (!this.maze.isBlockType(newPosition, BlockType.Wall)) {
+        const newPosition = new Vector2(this.position.x + distance * this.direction.x, this.position.y + distance * this.direction.y);
+        if (!this.map.isBlockType(newPosition, BlockType.Wall)) {
             this.position = newPosition;
         }
     }

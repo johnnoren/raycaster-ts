@@ -1,5 +1,5 @@
 import { CanvasId } from "./game.js";
-import { BlockType } from "./maze2dFactory.js";
+import { BlockType } from "./gameObjects/map2.js";
 import { Vector2 } from "./math/vector2.js";
 import { Direction } from "./math/direction.js";
 export class Ray {

@@ -1,7 +1,7 @@
 import { Dda } from "./math/dda.js";
 import { CanvasId } from "./game.js";
 import { GameObject, Status } from "./gameObject.js";
-import { BlockType, Maze2d, Position } from "./maze2dFactory.js";
+import { BlockType, Map2 } from "./gameObjects/map2.js";
 import { Player } from "./player.js";
 import { Vector2 } from "./math/vector2.js";
 import { Direction } from "./math/direction.js";
@@ -9,7 +9,7 @@ import { Direction } from "./math/direction.js";
 export class Ray implements GameObject {
     private wallCellCollisionVector: Vector2 = new Vector2(0, 0);
 
-    constructor(private player: Player, public status: Status, private map: Maze2d, private relativeAngle: number, private rayNumber: number, private numberOfRays: number, private color: string, private distanceToProjectionPlane: number, private blockSize: number, private dda: Dda) { }
+    constructor(private player: Player, public status: Status, private map: Map2, private relativeAngle: number, private rayNumber: number, private numberOfRays: number, private color: string, private distanceToProjectionPlane: number, private blockSize: number, private dda: Dda) { }
 
     update(): void { }
 
@@ -67,7 +67,7 @@ export class Ray implements GameObject {
     }
     
 
-    private drawRayOnMap(context: CanvasRenderingContext2D, playerPosition: Position, wallCellCollisionVector: Vector2): void {
+    private drawRayOnMap(context: CanvasRenderingContext2D, playerPosition: Vector2, wallCellCollisionVector: Vector2): void {
         const startX = playerPosition.x * this.blockSize;
         const startY = playerPosition.y * this.blockSize;
         const endX = (playerPosition.x + wallCellCollisionVector.x) * this.blockSize;

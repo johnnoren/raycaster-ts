@@ -5,12 +5,13 @@ import { GameObject, Status } from "./gameObject.js";
 import { GameObjectManager } from "./gameObjectManager.js";
 import { InfoManager } from "./infoManager.js";
 import { InputManager } from "./inputManager.js";
-import { BlockType, Maze2dFactory, Cell, Position } from "./maze2dFactory.js";
+import { MazeMap2Factory } from "./mazeMap2Factory.js";
 import { Player } from "./player.js";
 import { Ray } from "./ray.js";
 import { Roof } from "./roof.js";
 import { Vector2 } from "./math/vector2.js";
 import { Direction } from "./math/direction.js";
+import { BlockType } from "./gameObjects/map2.js";
 
 export enum CanvasId {
     map = "map",
@@ -29,7 +30,6 @@ export class Game {
     private infoManager: InfoManager;
     private mapCols: number;
     private mapRows: number;
-    private blockSize: number;
 
     constructor() {
 
@@ -41,9 +41,6 @@ export class Game {
         this.fovCanvas.width = 1280;
         this.fovCanvas.height = 720;
         this.fovCanvas.id = CanvasId.fov;
-        //const fovDiv = document.getElementById('fov') as HTMLDivElement;
-        //fovDiv.classList.add('d-flex', 'align-items-center', 'justify-content-center', 'h-100');
-        //fovDiv.appendChild(this.fovCanvas);
         canvasContainer.appendChild(this.fovCanvas);
         const context = this.fovCanvas.getContext('2d')!;
         context.fillStyle = 'rgba(0, 0, 0, 0.5)';
@@ -55,23 +52,19 @@ export class Game {
         this.mapCanvas.width = 180;
         this.mapCanvas.height = 180;
         this.mapCanvas.id = CanvasId.map;
-        //const mapDiv = document.getElementById('map') as HTMLDivElement;
-        //mapDiv.classList.add('d-flex', 'align-items-center', 'justify-content-center', 'h-100');
-        //mapDiv.appendChild(this.mapCanvas);
         canvasContainer.appendChild(this.mapCanvas);
 
         this.mapCols = 21;
         this.mapRows = 21;
-        this.blockSize = this.mapCanvas.width / this.mapCols;
 
-        const map = new Maze2dFactory().createMaze(this.mapCols, this.mapRows, this.blockSize);
+        const map = new MazeMap2Factory().createMaze(this.mapCols, this.mapRows);
         this.gameObjects.push(map);
         this.canvases.push(this.mapCanvas);
 
-
         // ---- PLAYER ----
-        const playerStartingCell: Cell = map.getClosestCell({ x: Math.floor(this.mapCols / 2), y: Math.floor(this.mapRows / 2) }, BlockType.Path);
-        const playerStartingPosition: Position = { x: playerStartingCell.position.x + 0.5, y: playerStartingCell.position.y + 0.5 };
+        const centerOfGrid = new Vector2(Math.floor(this.mapCols / 2), Math.floor(this.mapRows / 2));
+        const playerStartingCellPosition: Vector2 = map.getClosestCellPosition(centerOfGrid, BlockType.Path);
+        const playerStartingPosition: Vector2 = new Vector2(playerStartingCellPosition.x + 0.5, playerStartingCellPosition.y + 0.5);
         this.player = new Player(playerStartingPosition, new Direction(new Vector2(0,-1)), Status.Active, map);
         this.gameObjects.push(this.player);
 
@@ -99,14 +92,6 @@ export class Game {
         
             this.gameObjects.push(ray);
         }
-        
-        
-
-
-        // debug
-        //const color = "red";
-        //const ray = new Ray(this.player, Status.Active, map, 0, 0, 1, color, distanceToProjectionPlane, blockSize, dda);
-        //this.gameObjects.push(ray);
 
         // ---- GAME OBJECT MANAGER ----
         this.gameObjectsManager = new GameObjectManager();

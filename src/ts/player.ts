@@ -1,13 +1,13 @@
 import { CanvasId } from "./game.js";
 import { GameObject, Status } from "./gameObject.js";
-import { BlockType, Maze2d, Maze2dFactory, Position } from "./maze2dFactory.js";
 import { Vector2 } from "./math/vector2.js";
 import { Direction } from "./math/direction.js";
+import { BlockType, Map2 } from "./gameObjects/map2.js";
 
 type Matrix2 = [[number, number], [number, number]];
 
 export class Player implements GameObject {
-    constructor(public position: Position, public direction: Direction, public status: Status, private maze: Maze2d) { }
+    constructor(public position: Vector2, public direction: Direction, public status: Status, private map: Map2) { }
 
     public update(): void {
     }
@@ -55,7 +55,7 @@ export class Player implements GameObject {
         this.move(-0.02);
     }
 
-    public turn(angle: number): void { // Move these things into math
+    public turn(angle: number): void { // Move these things into vector2 and direction, call it rotate.
         const radians = angle * Math.PI / 180;
         const cosAngle = Math.cos(radians);
         const sinAngle = Math.sin(radians);
@@ -68,12 +68,12 @@ export class Player implements GameObject {
     }
     
     private move(distance: number): void {
-        const newPosition: Position = {
-            x: this.position.x + distance * this.direction.x,
-            y: this.position.y + distance * this.direction.y
-        };
+        const newPosition: Vector2 = new Vector2(
+            this.position.x + distance * this.direction.x,
+            this.position.y + distance * this.direction.y
+        );
 
-        if (!this.maze.isBlockType(newPosition, BlockType.Wall)) {
+        if (!this.map.isBlockType(newPosition, BlockType.Wall)) {
             this.position = newPosition;
         }
     }

@@ -8,7 +8,7 @@ export class Roof implements GameObject {
     update(): void {
         
     }
-    render(canvases: HTMLCanvasElement[], blockSize: number): void {
+    render(canvases: HTMLCanvasElement[], _blockSize: number): void {
         canvases.forEach((canvas) => {
             switch (canvas.id) {
                 case CanvasId.map:
