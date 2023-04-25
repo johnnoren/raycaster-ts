@@ -8,4 +8,7 @@ export class Direction {
     constructor(vector) {
         this.vector = vector.normalized();
     }
+    rotate(radians) {
+        return new Direction(this.vector.rotate(radians));
+    }
 }

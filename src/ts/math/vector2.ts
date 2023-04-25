@@ -1,5 +1,7 @@
 import { Direction } from "./direction.js";
 
+type Matrix2 = [[number, number], [number, number]];
+
 export class Vector2 {
     public readonly x: number;
     public readonly y: number;
@@ -51,6 +53,23 @@ export class Vector2 {
         const y = magnitude * direction.y;
 
         return new Vector2(x, y, magnitude);
+    }
+
+    public rotate(radians: number): Vector2 {
+        const cosAngle = Math.cos(radians);
+        const sinAngle = Math.sin(radians);
+        const rotationMatrix: Matrix2 = [
+            [cosAngle, -sinAngle],
+            [sinAngle, cosAngle]
+        ];
+        return this.multiplyMatrixAndVector(rotationMatrix, this);
+        
+    }
+
+    private multiplyMatrixAndVector(matrix: Matrix2, vector: Vector2): Vector2 {
+        const x = matrix[0][0] * vector.x + matrix[0][1] * vector.y;
+        const y = matrix[1][0] * vector.x + matrix[1][1] * vector.y;
+        return new Vector2(x, y);
     }
 
 }

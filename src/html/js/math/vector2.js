@@ -36,4 +36,18 @@ export class Vector2 {
         const y = magnitude * direction.y;
         return new Vector2(x, y, magnitude);
     }
+    rotate(radians) {
+        const cosAngle = Math.cos(radians);
+        const sinAngle = Math.sin(radians);
+        const rotationMatrix = [
+            [cosAngle, -sinAngle],
+            [sinAngle, cosAngle]
+        ];
+        return this.multiplyMatrixAndVector(rotationMatrix, this);
+    }
+    multiplyMatrixAndVector(matrix, vector) {
+        const x = matrix[0][0] * vector.x + matrix[0][1] * vector.y;
+        const y = matrix[1][0] * vector.x + matrix[1][1] * vector.y;
+        return new Vector2(x, y);
+    }
 }

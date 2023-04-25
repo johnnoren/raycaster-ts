@@ -1,6 +1,5 @@
 import { CanvasId } from "./game.js";
 import { Vector2 } from "./math/vector2.js";
-import { Direction } from "./math/direction.js";
 import { BlockType } from "./gameObjects/map2.js";
 export class Player {
     constructor(position, direction, status, map) {
@@ -35,10 +34,10 @@ export class Player {
         context.closePath();
     }
     turnLeft() {
-        this.turn(-3);
+        this.direction = this.direction.rotate(-0.052);
     }
     turnRight() {
-        this.turn(3);
+        this.direction = this.direction.rotate(0.052);
     }
     moveForward() {
         this.move(0.02);
@@ -46,25 +45,10 @@ export class Player {
     moveBackward() {
         this.move(-0.02);
     }
-    turn(angle) {
-        const radians = angle * Math.PI / 180;
-        const cosAngle = Math.cos(radians);
-        const sinAngle = Math.sin(radians);
-        const rotationMatrix = [
-            [cosAngle, -sinAngle],
-            [sinAngle, cosAngle]
-        ];
-        this.direction = new Direction(this.multiplyMatrixAndVector(rotationMatrix, this.direction.vector));
-    }
     move(distance) {
         const newPosition = new Vector2(this.position.x + distance * this.direction.x, this.position.y + distance * this.direction.y);
         if (!this.map.isBlockType(newPosition, BlockType.Wall)) {
             this.position = newPosition;
         }
-    }
-    multiplyMatrixAndVector(matrix, vector) {
-        const x = matrix[0][0] * vector.x + matrix[0][1] * vector.y;
-        const y = matrix[1][0] * vector.x + matrix[1][1] * vector.y;
-        return new Vector2(x, y);
     }
 }

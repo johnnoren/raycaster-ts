@@ -4,8 +4,6 @@ import { Vector2 } from "./math/vector2.js";
 import { Direction } from "./math/direction.js";
 import { BlockType, Map2 } from "./gameObjects/map2.js";
 
-type Matrix2 = [[number, number], [number, number]];
-
 export class Player implements GameObject {
     constructor(public position: Vector2, public direction: Direction, public status: Status, private map: Map2) { }
 
@@ -40,11 +38,11 @@ export class Player implements GameObject {
     }
 
     public turnLeft(): void {
-        this.turn(-3);
+        this.direction = this.direction.rotate(-0.052);
     }
 
     public turnRight(): void {
-        this.turn(3);
+        this.direction = this.direction.rotate(0.052);
     }
 
     public moveForward(): void {
@@ -53,18 +51,6 @@ export class Player implements GameObject {
 
     public moveBackward(): void {
         this.move(-0.02);
-    }
-
-    public turn(angle: number): void { // Move these things into vector2 and direction, call it rotate.
-        const radians = angle * Math.PI / 180;
-        const cosAngle = Math.cos(radians);
-        const sinAngle = Math.sin(radians);
-        const rotationMatrix: Matrix2 = [
-            [cosAngle, -sinAngle],
-            [sinAngle, cosAngle]
-        ];
-        this.direction = new Direction(this.multiplyMatrixAndVector(rotationMatrix, this.direction.vector));
-        
     }
     
     private move(distance: number): void {
@@ -78,10 +64,5 @@ export class Player implements GameObject {
         }
     }
 
-    private multiplyMatrixAndVector(matrix: Matrix2, vector: Vector2): Vector2 {
-        const x = matrix[0][0] * vector.x + matrix[0][1] * vector.y;
-        const y = matrix[1][0] * vector.x + matrix[1][1] * vector.y;
-        return new Vector2(x, y);
-    }
 }
 

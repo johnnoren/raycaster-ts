@@ -13,5 +13,9 @@ export class Direction {
     constructor(vector: Vector2) {
         this.vector = vector.normalized();
     }
+
+    public rotate(radians: number): Direction {
+        return new Direction(this.vector.rotate(radians));
+    }
     
 }
