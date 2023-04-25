@@ -1,14 +1,14 @@
 import { Dda } from "./math/dda.js";
-import { Floor } from "./floor.js";
+import { Floor } from "./gameObjects/floor.js";
 import { GameLoop } from "./gameLoop.js";
 import { GameObject, Status } from "./gameObject.js";
 import { GameObjectManager } from "./gameObjectManager.js";
 import { InfoManager } from "./infoManager.js";
 import { InputManager } from "./inputManager.js";
 import { MazeMap2Factory } from "./mazeMap2Factory.js";
-import { Player } from "./player.js";
-import { Ray } from "./ray.js";
-import { Roof } from "./roof.js";
+import { Player } from "./gameObjects/player.js";
+import { Ray } from "./gameObjects/ray.js";
+import { Roof } from "./gameObjects/roof.js";
 import { Vector2 } from "./math/vector2.js";
 import { Direction } from "./math/direction.js";
 import { BlockType } from "./gameObjects/map2.js";
@@ -30,6 +30,7 @@ export class Game {
     private infoManager: InfoManager;
     private mapCols: number;
     private mapRows: number;
+    private blockSize: number;
 
     constructor() {
 
@@ -42,9 +43,6 @@ export class Game {
         this.fovCanvas.height = 720;
         this.fovCanvas.id = CanvasId.fov;
         canvasContainer.appendChild(this.fovCanvas);
-        const context = this.fovCanvas.getContext('2d')!;
-        context.fillStyle = 'rgba(0, 0, 0, 0.5)';
-        context.fillRect(0, 0, this.fovCanvas.width, this.fovCanvas.height);
         this.canvases.push(this.fovCanvas);
 
         // ---- MAP ----
@@ -56,6 +54,7 @@ export class Game {
 
         this.mapCols = 21;
         this.mapRows = 21;
+        this.blockSize = this.mapCanvas.width / this.mapCols;
 
         const map = new MazeMap2Factory().createMaze(this.mapCols, this.mapRows);
         this.gameObjects.push(map);
@@ -124,7 +123,7 @@ export class Game {
     }
 
     public render(): void {
-        this.gameObjectsManager.render(this.canvases, this.mapCanvas.width / this.mapCols);
+        this.gameObjectsManager.render(this.canvases, this.blockSize);
     }
 
     public start(): void {

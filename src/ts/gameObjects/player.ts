@@ -1,8 +1,8 @@
-import { CanvasId } from "./game.js";
-import { GameObject, Status } from "./gameObject.js";
-import { Vector2 } from "./math/vector2.js";
-import { Direction } from "./math/direction.js";
-import { BlockType, Map2 } from "./gameObjects/map2.js";
+import { CanvasId } from "../game.js";
+import { GameObject, Status } from "../gameObject.js";
+import { Vector2 } from "../math/vector2.js";
+import { Direction } from "../math/direction.js";
+import { BlockType, Map2 } from "../gameObjects/map2.js";
 
 export class Player implements GameObject {
     constructor(public position: Vector2, public direction: Direction, public status: Status, private map: Map2) { }

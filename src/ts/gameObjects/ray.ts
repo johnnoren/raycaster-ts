@@ -1,10 +1,10 @@
-import { Dda } from "./math/dda.js";
-import { CanvasId } from "./game.js";
-import { GameObject, Status } from "./gameObject.js";
-import { BlockType, Map2 } from "./gameObjects/map2.js";
+import { Dda } from "../math/dda.js";
+import { CanvasId } from "../game.js";
+import { GameObject, Status } from "../gameObject.js";
+import { BlockType, Map2 } from "../gameObjects/map2.js";
 import { Player } from "./player.js";
-import { Vector2 } from "./math/vector2.js";
-import { Direction } from "./math/direction.js";
+import { Vector2 } from "../math/vector2.js";
+import { Direction } from "../math/direction.js";
 
 export class Ray implements GameObject {
     private wallCellCollisionVector: Vector2 = new Vector2(0, 0);

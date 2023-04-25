@@ -23,8 +23,7 @@ export class GameObjectManager {
 
     private clearCanvases(canvases: HTMLCanvasElement[]): void {
         canvases.forEach(canvas => {
-            const context = canvas.getContext('2d');
-            context!.clearRect(0, 0, canvas.width, canvas.height);
+            canvas.getContext('2d')!.clearRect(0, 0, canvas.width, canvas.height);
         });
     }
 }

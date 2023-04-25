@@ -1,7 +1,7 @@
-import { CanvasId } from "./game.js";
-import { GameObject, Status } from "./gameObject.js";
+import { CanvasId } from "../game.js";
+import { GameObject, Status } from "../gameObject.js";
 
-export class Floor implements GameObject {
+export class Roof implements GameObject {
 
     constructor(public status: Status) { }
 
@@ -27,14 +27,13 @@ export class Floor implements GameObject {
         const width = canvas.width;
         const height = canvas.height;
         const heightToDraw = height / 2;
-        const colorStep = 100 / heightToDraw;
-        let color = 0;
-        const startPositionY = heightToDraw;
+        const colorStep = 150 / heightToDraw;
+        let color = 150;
 
         for (let i = 0; i < heightToDraw; i++) {
             context!.fillStyle = 'rgba(' + color + ', ' + color + ', ' + color + ', 1)';
-            context!.fillRect(0, startPositionY + i, width, 1);
-            color += colorStep;
+            context!.fillRect(0, i, width, 1);
+            color -= colorStep;
         }
     }
     
