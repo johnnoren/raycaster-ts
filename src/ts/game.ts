@@ -35,13 +35,14 @@ export class Game {
     constructor() {
 
         // ---- CANVAS CONTAINER ----
-        const canvasContainer = document.getElementById('canvas-container') as HTMLDivElement;
+        const canvasContainer = document.querySelector('.canvas-wrapper') as HTMLDivElement;
 
         // ---- FOV ----
         this.fovCanvas = document.createElement('canvas');
         this.fovCanvas.width = 1280;
         this.fovCanvas.height = 720;
         this.fovCanvas.id = CanvasId.fov;
+        this.fovCanvas.classList.add('centered');
         canvasContainer.appendChild(this.fovCanvas);
         this.canvases.push(this.fovCanvas);
 
@@ -50,6 +51,7 @@ export class Game {
         this.mapCanvas.width = 180;
         this.mapCanvas.height = 180;
         this.mapCanvas.id = CanvasId.map;
+        this.mapCanvas.classList.add('top-left');
         canvasContainer.appendChild(this.mapCanvas);
 
         this.mapCols = 21;

@@ -9,29 +9,46 @@
     <style>
         body {
             background-color: #000;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
         }
         #canvas-container {
             position: relative;
         }
 
-        #canvas-container canvas {
+        #canvas-container .canvas-wrapper {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        #canvas-container .canvas-wrapper canvas.top-left {
             position: absolute;
             left: 0;
             top: 0;
         }
+
         #info {
             color: white;
+            text-align: center;
+            margin-top: 1rem;
         }
     </style>
 </head>
 <body class="d-flex flex-column h-100">
     
-        <div id="canvas-container" class="flex-grow-1">
+    <div id="canvas-container" class="flex-grow-1">
+        <div class="canvas-wrapper">
         </div>
+    </div>
 
-        <div id="info" class="m-2"></div>
+    <div id="info" class="m-2"></div>
     
     <script src="js/index.js" type="module"></script>
 </body>
 </html>
-
